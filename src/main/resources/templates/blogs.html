@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Blogs'"></title>
+</head>
+<body>
+    <div th:each="post : ${posts}">
+        <div class = "postDiv">
+            <div class="titleDiv">
+                <a th:href="@{/readPost(id=${post.id})}"><h2 class="title" th:text="${post.title}"></h2></a>
+            </div>
+            <div class="excerptDiv">
+                Excerpt:<br>
+                <p th:text="${post.excerpt}"></p>
+            </div>
+            <div class="authorTimeDiv">
+                <div class="authorDiv">
+                    Author:
+                    <p th:text="${post.author}"></p>
+                </div>
+                <div class="timeDiv">
+                    <p>
+                        Published:
+                        <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    </p>
+                    <p>
+                        Created:
+                        <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    </p>
+                    <p>
+                        Updated:
+                        <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

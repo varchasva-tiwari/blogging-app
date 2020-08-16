@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Blog Post Form'"></title>
+</head>
+<body>
+    <form th:action="@{/createPost}" method="post" th:object="${post}">
+
+        <label>Enter title:</label><br><br>
+        <input type="text" th:value="${post.title}" name="title"><br><br>
+
+        <label>Enter excerpt:</label><br><br>
+        <input type="textarea" th:value="${post.excerpt}" name="excerpt"><br><br>
+
+        <label>Enter content:</label><br><br>
+        <input type="textarea" th:value="${post.content}" name="content"><br><br>
+
+        <label>Enter author's name:</label><br><br>
+        <input type="textarea" th:value="${post.author}" name="author"><br><br>
+
+        <label>Enter comma separated tags:</label><br><br>
+        <div th:object="${newTags}">
+            <input type="text" id="tagField" th:value="${newTags}" name="newTags"><br><br>
+        </div>
+
+        <label>You can also pick from these tags:</label><br><br>
+        <button type="button" th:each="tag : ${oldTags}" th:text="${tag.name}"
+                th:tagName="${tag.name}" th:onclick="useTag(this.getAttribute('tagName'));"></button><br><br>
+
+        <input type="submit" value="Post now!">
+    </form>
+    <script th:inline="javascript">
+        function useTag(tagName) {
+            var tagField = document.getElementById("tagField");
+            if(tagField.value == '')
+                tagField.value = tagField.value + tagName;
+            else
+                tagField.value = tagField.value + ', ' + tagName;
+        }
+    </script>
+</body>
+</html>

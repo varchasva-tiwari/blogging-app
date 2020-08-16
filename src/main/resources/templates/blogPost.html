@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.author}  + '\'' + 's Post'"></title>
+</head>
+<body>
+<form th:action="@{/editPost}" th:object="${post}" method="post">
+    <div class = "postDiv">
+        <div class="titleDiv">
+            <h2 class="title" th:text="${post.title}"></h2>
+            <input type="text" class="postTextbox" style="display:none;"
+                   th:value="${post.title}" name="title">
+        </div><br><br>
+        <input type="hidden" th:value="${post.id}" name="id" >
+        <input type="hidden" th:value="${post.excerpt}" name="excerpt">
+        <input type="hidden" th:value="${post.publishedAt}" name="publishedAt">
+        <input type="hidden" th:value="${post.createdAt}" name="createdAt">
+        <input type="hidden" th:value="${post.isPublished}" name="published">
+
+        <div class="contentDiv">
+            Content:<br>
+            <p th:text="${post.content}"></p>
+            <input type="text" class="postTextbox" style="display:none;" th:value="${post.content}" name="content">
+        </div><br><br>
+        <div>
+            <div class="authorDiv">
+                Author:
+                <p th:text="${post.author}"></p>
+                <input type="text" class="postTextbox" style="display:none;" th:value="${post.author}" name="author">
+            </div><br><br>
+            <div class="timeDiv">
+                <p>
+                    Published:
+                    <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+                <p>
+                    Created:
+                    <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+                <p>
+                    Last Updated:
+                    <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+            </div>
+            <div class="tagsDiv">
+                Tags:
+                <span th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
+            </div>
+
+                <a th:href="@{/createComment(id=${post.id})}">Create new comment!</a>
+        </div><br><br>
+        <div>
+            <button type="button" id="editPostBtn" th:onclick="editPost();">Edit post!</button>
+        </div><br><br>
+
+        <div>
+            <a th:href="@{/deletePost(id=${post.id})}">Delete this post!</a>
+        </div><br><br>
+
+        <div>
+            <input type="submit" id="submitBtn" style="display:none;" value="Save edited changes!">
+        </div>
+    </div>
+</form>
+<script th:inline="javascript">
+    function editPost() {
+        /*<![CDATA[*/
+            var title = /*[[${post.title}]]*/;
+            var content = /*[[${post.content}]]*/;
+            var author = /*[[${post.author}]]*/;
+        /*]]>*/
+
+        var inputText = document.getElementsByClassName("postTextbox");
+
+        inputText[0].value = title;
+        inputText[0].style.display = "block";
+
+        inputText[1].value = content;
+        inputText[1].style.display = "block";
+
+        inputText[2].value = author;
+        inputText[2].style.display = "block";
+
+        var editBtn = document.getElementById("editPostBtn");
+        editBtn.style.display = "none";
+
+        var submitBtn = document.getElementById("submitBtn");
+        submitBtn.style.display = "block";
+    }
+
+
+</script>
+</body>
+</html>
