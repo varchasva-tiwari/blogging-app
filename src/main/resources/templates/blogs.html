@@ -5,6 +5,9 @@
     <title th:text="'Blogs'"></title>
 </head>
 <body>
+Sort posts by:
+<a th:href="@{'/page/' + ${currentPage} + '?sortField=publishedAt&sortOrder=asc'}">Oldest First</a>
+<a th:href="@{'/page/' + ${currentPage} + '?sortField=publishedAt&sortOrder=desc'}">Newest First</a>
     <div th:each="post : ${posts}">
         <div class = "postDiv">
             <div class="titleDiv">
@@ -21,19 +24,43 @@
                 </div>
                 <div class="timeDiv">
                     <p>
-                        Published:
+                        Published At:
                         <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
                     <p>
-                        Created:
+                        Created At:
                         <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
                     <p>
-                        Updated:
+                        Updated At:
                         <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
                 </div>
             </div>
+        </div>
+    </div><br>
+
+    <div th:if="${totalPages > 1}">
+        <div class="pagesRow">
+            Total posts: <p th:text="${totalPosts}"></p>
+            Posts on this page: <p th:text="${pageSize}"></p>
+            <p>
+                <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                    <a th:if="${currentPage != i}" th:href="@{'/page/' + ${i} + '?sortField=' + ${sortField} +'&sortOrder=asc'}">[[${i}]]</a>
+                    <span th:unless="${currentPage != i}">[[${i}]]</span>
+                </span>
+            </p><br>
+
+            <p>
+                <a th:if="${currentPage - 1 > 0}" th:href="@{'/page/' + ${currentPage -1} + '?sortField=' + ${sortField} +'&sortOrder=asc'}">Previous</a>
+                <span th:unless="${currentPage - 1 > 0}">Previous</span>
+            </p>
+
+            <p>
+                <a th:if="${currentPage < totalPages}" th:href="@{'/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} +'&sortOrder=asc'}">Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+            </p>
+
         </div>
     </div>
 </body>

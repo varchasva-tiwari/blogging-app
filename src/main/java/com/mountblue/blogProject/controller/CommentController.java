@@ -13,10 +13,11 @@ public class CommentController {
     CommentService commentService;
 
     @GetMapping("/createComment")
-    public String createComment(@RequestParam("id") int postId, Model model) {
+    public String showCommentForm(@RequestParam("id") int postId, Model model) {
         Comment comment = new Comment();
         comment.setPostId(postId);
-        model.addAttribute("newComment", comment);
+
+        model.addAttribute("comment", comment);
         return "commentForm";
     }
 
@@ -25,4 +26,23 @@ public class CommentController {
         commentService.createComment(comment);
         return "redirect:/readPost?id=" + comment.getPostId();
     }
+
+    @GetMapping("/updateComment")
+    public String updateComment(@ModelAttribute("comment") Comment comment, Model model) {
+        model.addAttribute("comment", comment);
+        return "commentForm";
+    }
+
+    @PostMapping("/updateComment")
+    public String updateComment(@ModelAttribute("comment") Comment comment) {
+        commentService.updateComment(comment);
+        return "home";
+    }
+
+    @RequestMapping("/deleteComment")
+    public String deleteComment(@RequestParam("postId") int postId, @RequestParam("commentId") int commentId) {
+        commentService.deleteComment(postId, commentId);
+        return "redirect:/readPost?id=" + postId;
+    }
+
 }

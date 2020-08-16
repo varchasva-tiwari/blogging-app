@@ -3,6 +3,10 @@ package com.mountblue.blogProject.service;
 import com.mountblue.blogProject.entity.Post;
 import com.mountblue.blogProject.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
@@ -48,5 +52,11 @@ public class PostService {
 
     public void deletePost(int id) {
         postRepository.deleteById(id);
+    }
+
+    public Page<Post> findPaginated(int pageNo, int pageSize, String sortField, String sortOrder) {
+        Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
+        return postRepository.findAll(pageable);
     }
 }

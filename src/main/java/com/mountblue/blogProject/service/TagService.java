@@ -37,8 +37,8 @@ public class TagService {
                 tag.setCreatedAt(LocalDateTime.now());
 
                 tagRepository.save(tag);
-                newTagIds.add(tagRepository.findIdByName(name));
             }
+            newTagIds.add(tagRepository.findIdByName(name));
         });
 
         return newTagIds;

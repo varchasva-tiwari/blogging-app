@@ -22,4 +22,18 @@ public class CommentService {
     public List<Comment> readComments(int postId) {
         return commentRepository.readCommentsById(postId);
     }
+
+    public void updateComment(Comment comment) {
+        comment.setUpdatedAt(LocalDateTime.now());
+        commentRepository.save(comment);
+    }
+
+    public void deleteComments(int postId) {
+        if(commentRepository.readCommentsById(postId).size() > 0)
+            commentRepository.deleteById(postId);
+    }
+
+    public void deleteComment(int postId, int commentId) {
+        commentRepository.deleteByPostAndCommentId(postId, commentId);
+    }
 }

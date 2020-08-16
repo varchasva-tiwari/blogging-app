@@ -5,7 +5,7 @@
     <title th:text="${post.author}  + '\'' + 's Post'"></title>
 </head>
 <body>
-<form th:action="@{/editPost}" th:object="${post}" method="post">
+<form th:action="@{/updatePost}" th:object="${post}" method="post">
     <div class = "postDiv">
         <div class="titleDiv">
             <h2 class="title" th:text="${post.title}"></h2>
@@ -42,12 +42,45 @@
                     Last Updated:
                     <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
-            </div>
+            </div><br><br>
             <div class="tagsDiv">
                 Tags:
                 <span th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
-            </div>
+            </div><br><br>
+            <div class="commentsDiv">
+                Comments:
+                <div th:each="comment : ${comments}" th:object="${comment}">
+                    <input type="hidden" th:value="${comment.id}" name="id">
+                    <input type="hidden" th:value="${comment.postId}" name="postId" >
 
+                    <div>
+                        Name: <span th:text="${comment.name}"></span>
+                    </div><br><br>
+
+                    <div>
+                        Email: <span th:text="${comment.email}"></span>
+                    </div><br><br>
+
+                    <div>
+                        Comment: <span th:text="${comment.comment}"></span>
+                    </div><br><br>
+                    <div class="timeDiv">
+                        <p>
+                            Created At:
+                            <span th:text="${comment.createdAt}"></span>
+                        </p>
+
+                        <p>
+                            Updated At:
+                            <span th:text="${comment.updatedAt}"></span>
+                        </p>
+                    </div>
+
+                    <a id="editCmntLink" th:href="@{/editComment}" style="display:none;">Edit comment</a><br><br>
+
+                    <a th:href="@{/deleteComment(postId=${comment.postId},commentId=${comment.id})}">Delete comment</a>
+                </div>
+            </div>
                 <a th:href="@{/createComment(id=${post.id})}">Create new comment!</a>
         </div><br><br>
         <div>
@@ -88,8 +121,6 @@
         var submitBtn = document.getElementById("submitBtn");
         submitBtn.style.display = "block";
     }
-
-
 </script>
 </body>
 </html>

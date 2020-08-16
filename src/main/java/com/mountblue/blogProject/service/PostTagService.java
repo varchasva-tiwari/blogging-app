@@ -26,7 +26,7 @@ public class PostTagService {
         });
     }
 
-    public List<Tag> readTagsByPost(int postId) {
+    public List<Tag> readTags(int postId) {
          List<PostTag> postTags = postTagRepository.readTagsByPost(postId);
 
          List<Tag> tags = new ArrayList<>();
@@ -36,5 +36,9 @@ public class PostTagService {
          });
 
          return tags;
+    }
+
+    public void deletePostTag(int postId) {
+        postTagRepository.deleteById(postId);
     }
 }

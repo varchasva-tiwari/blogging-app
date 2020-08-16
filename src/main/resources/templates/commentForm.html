@@ -5,17 +5,17 @@
     <title th:text="'Comment Form'"></title>
 </head>
 <body>
-    <form th:action="@{/createComment}" th:object="${newComment}" method="post">
-        <input type="hidden" th:value="${newComment.postId}" name="postId">
+    <form th:action="@{/createComment}" th:object="${comment}" method="post">
+        <input type="hidden" th:value="${comment.postId}" name="postId">
 
         <label>Enter name:</label><br><br>
-        <input type="text" th:value="${newComment.name}" name="name"><br><br>
+        <input type="text" th:value="${comment.name}" name="name"><br><br>
 
         <label>Enter email:</label><br><br>
-        <input type="text" th:value="${newComment.email}" name="email"><br><br>
+        <input type="text" th:value="${comment.email}" name="email"><br><br>
 
         <label>Enter comment:</label><br><br>
-        <input type="textarea" th:value="${newComment.comment}" name="comment"><br><br>
+        <input type="textarea" th:value="${comment.comment}" name="comment"><br><br>
 
         <input type="submit" value="Post comment!">
     </form>
