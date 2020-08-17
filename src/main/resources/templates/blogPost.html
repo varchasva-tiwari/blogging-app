@@ -5,6 +5,9 @@
     <title th:text="${post.author}  + '\'' + 's Post'"></title>
 </head>
 <body>
+<a th:href="@{/readPosts}">Back to Blogs</a><br><br>
+<a th:href="@{/home}">Back to Home</a><br><br>
+
 <form th:action="@{/updatePost}" th:object="${post}" method="post">
     <div class = "postDiv">
         <div class="titleDiv">

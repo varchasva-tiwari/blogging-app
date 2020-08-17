@@ -5,6 +5,7 @@
     <title th:text="'Comment Form'"></title>
 </head>
 <body>
+    <a th:href="@{/home}">Back to Home</a><br><br>
     <form th:action="@{/createComment}" th:object="${comment}" method="post">
         <input type="hidden" th:value="${comment.postId}" name="postId">
 

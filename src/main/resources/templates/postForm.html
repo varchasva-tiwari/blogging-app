@@ -5,6 +5,7 @@
     <title th:text="'Blog Post Form'"></title>
 </head>
 <body>
+    <a th:href="@{/home}">Back to Home</a><br><br>
     <form th:action="@{/createPost}" method="post" th:object="${post}">
 
         <label>Enter title:</label><br><br>

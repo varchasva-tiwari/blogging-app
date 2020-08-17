@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,22 +71,48 @@ public class PostController {
 
     @RequestMapping("/readPosts")
     private String readPosts(Model model) {
-       return findPaginated(1,"publishedAt", "asc", model);
+        return getPaginated(1, 10,"publishedAt", "asc", model);
     }
 
-    @RequestMapping("/page/{pageNo}")
-    private String findPaginated(@PathVariable("pageNo") int pageNo, @RequestParam("sortField") String sortField, @RequestParam("sortOrder") String sortOrder, Model model) {
-        int pageSize = 10;
+    @RequestMapping(value = "/readPosts", params = {"start", "limit", "sortField", "sortOrder"})
+    private String getPaginated(@RequestParam(value = "start", required = false) Integer pageNo,
+                             @RequestParam(value = "limit", required = false) Integer pageSize,
+                             @RequestParam(value = "sortField", required = false) String sortField,
+                             @RequestParam(value = "sortOrder", required = false) String sortOrder, Model model) {
 
-        Page page = postService.findPaginated(pageNo, pageSize, sortField, sortOrder);
+        Page page = null;
+        List<Post> posts = new ArrayList<>();
 
-        List<Post> posts = page.getContent();
+        if(pageNo != null) {
+            if(sortField != null) {
+                page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
+            }
+            else {
+                page = postService.getPaginated(pageNo, pageSize);
+            }
+            posts = page.getContent();
+        }
+
+        else {
+            if(sortField != null) {
+                posts = postService.getSorted(sortField, sortOrder);
+            }
+        }
 
         model.addAttribute("currentPage", pageNo);
-        model.addAttribute("pageSize", page.getNumberOfElements());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalPosts", page.getTotalElements());
         model.addAttribute("sortField", sortField);
+        model.addAttribute("posts", posts);
+
+        return "blogs";
+    }
+
+    @RequestMapping(value = "/readPosts", params = "search")
+    private String readPosts(@RequestParam("search") String keyword,Model model) {
+        List<Post> posts = postService.search(keyword);
         model.addAttribute("posts", posts);
         return "blogs";
     }
