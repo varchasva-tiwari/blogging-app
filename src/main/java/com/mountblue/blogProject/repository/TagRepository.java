@@ -13,5 +13,5 @@ public interface TagRepository extends JpaRepository<Tag,Integer> {
     Tag findTagByName(String name);
 
     @Query("SELECT t.id FROM Tag t WHERE t.name = :name")
-    int findIdByName(@Param("name") String name);
+    int getId(@Param("name") String name);
 }

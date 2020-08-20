@@ -3,6 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="'Blogs'"></title>
+    <style>
+        body {
+            padding-left: 50px;
+        }
+
+        .title {
+            color: black;
+        }
+
+        .title:hover{
+            color: #cf293a;
+        }
+
+        .postHeading {
+            color: #36967b;
+        }
+
+        .filterDiv{
+            width: 600px;
+            border: 2px solid black;
+        }
+
+        fieldset {
+            width: 100px;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,63 +44,82 @@ Search posts by keywords:
     Sort posts by:
     <a th:href="@{/readPosts(start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Oldest First</a>
     <a th:href="@{/readPosts(start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=desc)}">Newest First</a><br><br>
-    <a th:href="@{/readPosts}">Refresh</a><br>
-</div>
+</div><br>
+
+<h3>Filter Posts:</h3>
+<fieldset>
+    <form th:action="@{/filter(author=${author}, dateTime=${dateTime}, tags=${tags})}">
+        <input type="text" th:value="${author}" name="author" placeholder="By Author"><br><br>
+        <input type="datetime-local" th:value="${dateTime}" name="dateTime"><br><br>
+        <input type="text" th:value="${tags}" name="tags" placeholder="By Tags"><br><br>
+        <input type="submit" value="Filter posts!">
+    </form>
+</fieldset><br><br>
+
+<a th:href="@{/readPosts}">Refresh</a><br><br>
 
 
-    <div th:each="post : ${posts}">
-        <div class = "postDiv">
+    <div th:each="postTag : ${postTags}">
+        <div class = "postDiv" th:>
             <div class="titleDiv">
-                <a th:href="@{/readPost(id=${post.id})}"><h2 class="title" th:text="${post.title}"></h2></a>
+                <a class="title" th:href="@{/readPost(id=${post.id})}"><h2 class="title" th:text="${post.title}"></h2></a>
             </div>
             <div class="excerptDiv">
-                Excerpt:<br>
+                <b class="postHeading">Excerpt:</b>
                 <p th:text="${post.excerpt}"></p>
             </div>
             <div class="authorTimeDiv">
                 <div class="authorDiv">
-                    Author:
+                    <b class="postHeading">Author:</b>
                     <p th:text="${post.author}"></p>
                 </div>
                 <div class="timeDiv">
                     <p>
-                        Published At:
+                        <b class="postHeading">Published At:</b>
                         <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
                     <p>
-                        Created At:
+                        <b class="postHeading">Created At:</b>
                         <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
                     <p>
-                        Updated At:
+                        <b class="postHeading">Updated At:</b>
                         <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
                     </p>
+                </div><br>
+                Tags:
+                <div th:each="tag : ${postTag.value}">
+                    <span th:text="${tag.name}"></span>
                 </div>
             </div>
         </div>
     </div><br>
 
     <div th:if="${totalPages != null}">
-        <div th:if="${totalPages > 1}">
+        <div th:if="${totalPages >= 1}">
             <div class="pagesRow">
                 Total posts overall: <p th:text="${totalPosts}"></p>
-                Total posts on this page: <p th:text="${currentTotalPosts}"></p>
-                <p>
-                    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                Total posts on this page: <p th:text="${currentTotalPosts}"></p><br>
+
+                <div class="pagesDiv" th:if="${totalPages > 1}">
+                    <p>
+                        Pages:
+                        <span th:each="i: ${#numbers.sequence(1, totalPages)}">
                         <a th:if="${currentPage != i}" th:href="@{/readPosts(start=${i},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">[[${i}]]</a>
                         <span th:unless="${currentPage != i}">[[${i}]]</span>
                     </span>
-                </p><br>
+                    </p><br>
 
-                <p>
-                    <a th:if="${currentPage - 1 > 0}" th:href="@{/readPosts(start=${currentPage - 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Previous</a>
-                    <span th:unless="${currentPage - 1 > 0}">Previous</span>
-                </p>
+                    <p>
+                        <a th:if="${currentPage - 1 > 0}" th:href="@{/readPosts(start=${currentPage - 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Previous</a>
+                        <span th:unless="${currentPage - 1 > 0}">Previous</span>
+                    </p>
 
-                <p>
-                    <a th:if="${currentPage < totalPages}" th:href="@{/readPosts(start=${currentPage + 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Next</a>
-                    <span th:unless="${currentPage < totalPages}">Next</span>
-                </p>
+                    <p>
+                        <a th:if="${currentPage < totalPages}" th:href="@{/readPosts(start=${currentPage + 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Next</a>
+                        <span th:unless="${currentPage < totalPages}">Next</span>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

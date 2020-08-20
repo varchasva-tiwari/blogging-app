@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title th:text="'Home Page'"></title>
+    <style>
+        a {
+            color: black;
+        }
+
+        a:hover {
+            color: #77a2c9;
+        }
+    </style>
 </head>
 <body>
-    <a th:href="@{/createPost}">Create new blog post</a><br><br>
+    <div sec:authorize="isAuthenticated()">
+        <a th:href="@{/showPostForm}">Create new blog post</a><br><br>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()">
+        <p>Register to start posting blogs:</p>
+        <a th:href="@{/register}">Register</a>
+    </div><br>
+
     <a th:href="@{/readPosts}">See existing posts</a><br><br>
 </body>
 </html>

@@ -1,24 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title th:text="'Comment Form'"></title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .submitBtn {
+            height: 30px;
+            background-color: #5fb382;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .submitBtn:hover {
+            background-color: #e7e7e7;
+            cursor: pointer;
+            color: black;
+        }
+
+        .submitBtnDiv {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
+    <a th:href="@{/readPosts}">Back to Blogs</a><br><br>
     <a th:href="@{/home}">Back to Home</a><br><br>
-    <form th:action="@{/createComment}" th:object="${comment}" method="post">
-        <input type="hidden" th:value="${comment.postId}" name="postId">
+    <fieldset>
+    <form th:action="@{/createComment}" th:object="${newComment}" method="post">
+        <input type="hidden" th:value="${newComment.postId}" name="postId">
+        <input type="hidden" th:value="${newComment.id}" name="id">
 
         <label>Enter name:</label><br><br>
-        <input type="text" th:value="${comment.name}" name="name"><br><br>
+
+        <div th:if="${#authorization.expression('hasRole(''ROLE_author'')')}">
+            <input type="text" disabled th:value="${#authentication.name}" name="name"><br><br>
+        </div>
+
+        <div th:unless="${#authorization.expression('hasRole(''ROLE_author'')')}">
+            <input type="text" th:value="${newComment.name}" name="name"><br><br>
+        </div>
 
         <label>Enter email:</label><br><br>
-        <input type="text" th:value="${comment.email}" name="email"><br><br>
+        <input type="text" th:value="${newComment.email}" name="email"><br><br>
 
         <label>Enter comment:</label><br><br>
-        <input type="textarea" th:value="${comment.comment}" name="comment"><br><br>
+        <textarea th:text="${newComment.comment}" th:value="${newComment.comment}" name="comment"></textarea><br><br>
 
-        <input type="submit" value="Post comment!">
-    </form>
+        <div class="submitBtnDiv">
+            <input type="submit" class="submitBtn" value="Post comment!">
+        </div>
+    </form></fieldset>
 </body>
 </html>

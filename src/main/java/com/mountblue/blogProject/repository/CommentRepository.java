@@ -14,10 +14,10 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment,Integer> {
 
     @Query("SELECT c from Comment c WHERE c.postId = :postId")
-    List<Comment> readCommentsById(@Param("postId") int postId);
+    List<Comment> read(@Param("postId") int postId);
 
     @Modifying
     @Transactional
     @Query(value = "DELETE from comments c WHERE c.id = :commentId AND c.post_id = :postId", nativeQuery = true)
-    void deleteByPostAndCommentId(@Param("postId") int postId, @Param("commentId") int commentId);
+    void delete(@Param("postId") int postId, @Param("commentId") int commentId);
 }

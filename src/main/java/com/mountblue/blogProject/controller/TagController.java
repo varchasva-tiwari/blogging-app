@@ -14,7 +14,7 @@ public class TagController {
     @RequestMapping("/readTags")
     private ModelAndView readTags() {
         ModelAndView mv = new ModelAndView();
-        mv.addObject("tag", tagService.readTags());
+        mv.addObject("tag", tagService.read());
         return mv;
     }
 }

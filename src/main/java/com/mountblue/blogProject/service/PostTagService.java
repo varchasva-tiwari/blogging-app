@@ -9,25 +9,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
 public class PostTagService {
     @Autowired
-    PostTagRepository postTagRepository;
+    private PostTagRepository postTagRepository;
 
     @Autowired
-    TagRepository tagRepository;
+    private TagRepository tagRepository;
 
-    public void createPostTag(int postId, List<Integer> tagIds) {
+    public void create(int postId, List<Integer> tagIds) {
         tagIds.forEach(tagId -> {
-            postTagRepository.createPostTag(postId, tagId);
+            if(postTagRepository.containsTag(postId, tagId).isEmpty())
+                postTagRepository.create(postId, tagId);
         });
     }
 
     public List<Tag> readTags(int postId) {
-         List<PostTag> postTags = postTagRepository.readTagsByPost(postId);
+         List<PostTag> postTags = postTagRepository.readTags(postId);
 
          List<Tag> tags = new ArrayList<>();
 
@@ -38,7 +39,17 @@ public class PostTagService {
          return tags;
     }
 
-    public void deletePostTag(int postId) {
-        postTagRepository.deleteById(postId);
+    public LinkedHashMap<Post, List<Tag>> getPostTags(List<Post> posts) {
+        LinkedHashMap<Post,List<Tag>> postTags = new LinkedHashMap<>();
+
+        posts.forEach(post -> {
+            postTags.put(post, readTags(post.getId()));
+        });
+
+        return postTags;
+    }
+
+    public void delete(int postId) {
+        postTagRepository.deleteTag(postId);
     }
 }

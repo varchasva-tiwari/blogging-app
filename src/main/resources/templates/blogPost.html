@@ -1,129 +1,159 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title th:text="${post.author}  + '\'' + 's Post'"></title>
+    <style>
+        body {
+            padding-left: 50px;
+        }
+
+        .title {
+            color:  #cf293a;
+        }
+
+        .postHeading {
+            color: #36967b;
+            font-size: 20px;
+        }
+
+        .postContent {
+            font-size: 18px;
+        }
+
+        .editBtnDiv{
+            display: flex;
+            flex-direction: row;
+        }
+
+        #editPostBtn {
+            height: 30px;
+            background-color: #c28fc9;
+            color: white;
+            border-radius: 4px;
+        }
+
+        #editPostBtn:hover {
+            background-color: #e7e7e7;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <a th:href="@{/readPosts}">Back to Blogs</a><br><br>
 <a th:href="@{/home}">Back to Home</a><br><br>
 
 <form th:action="@{/updatePost}" th:object="${post}" method="post">
+    <input type="hidden" th:value="${post.id}" name="id" >
+    <input type="hidden" th:value="${post.excerpt}" name="excerpt">
+    <input type="hidden" th:value="${post.isPublished}" name="published">
+
     <div class = "postDiv">
         <div class="titleDiv">
-            <h2 class="title" th:text="${post.title}"></h2>
-            <input type="text" class="postTextbox" style="display:none;"
-                   th:value="${post.title}" name="title">
-        </div><br><br>
-        <input type="hidden" th:value="${post.id}" name="id" >
-        <input type="hidden" th:value="${post.excerpt}" name="excerpt">
-        <input type="hidden" th:value="${post.publishedAt}" name="publishedAt">
-        <input type="hidden" th:value="${post.createdAt}" name="createdAt">
-        <input type="hidden" th:value="${post.isPublished}" name="published">
+
+            <u class="title"><h1 th:text="${post.title}"></h1></u>
+            <input type="hidden" th:value="${post.title}" name="title">
+
+            <div class="authorDiv">
+                <p><b class="postHeading">Author: </b><span class="postContent" th:text="${post.author}"></span></p>
+                <input type="hidden" th:value="${post.author}" name="author">
+            </div>
+        </div><br>
+
 
         <div class="contentDiv">
-            Content:<br>
-            <p th:text="${post.content}"></p>
-            <input type="text" class="postTextbox" style="display:none;" th:value="${post.content}" name="content">
-        </div><br><br>
-        <div>
-            <div class="authorDiv">
-                Author:
-                <p th:text="${post.author}"></p>
-                <input type="text" class="postTextbox" style="display:none;" th:value="${post.author}" name="author">
-            </div><br><br>
-            <div class="timeDiv">
+            <b class="postHeading">Content:</b><br>
+            <p class="postContent" th:text="${post.content}"></p>
+            <input type="hidden" th:value="${post.content}" name="content">
+        </div><br>
+
+        <div class="timeDiv">
                 <p>
-                    Published:
-                    <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <b class="postHeading">Published:</b>
+                    <span class="postContent" th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <input type="hidden" th:value="${post.publishedAt}" name="publishedAt">
                 </p>
                 <p>
-                    Created:
-                    <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <b class="postHeading">Created:</b>
+                    <span class="postContent" th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <input type="hidden" th:value="${post.createdAt}" name="createdAt">
                 </p>
                 <p>
-                    Last Updated:
-                    <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <b class="postHeading">Last Updated:</b>
+                    <span class="postContent" th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
             </div><br><br>
-            <div class="tagsDiv">
-                Tags:
-                <span th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
-            </div><br><br>
-            <div class="commentsDiv">
-                Comments:
-                <div th:each="comment : ${comments}" th:object="${comment}">
-                    <input type="hidden" th:value="${comment.id}" name="id">
-                    <input type="hidden" th:value="${comment.postId}" name="postId" >
 
-                    <div>
-                        Name: <span th:text="${comment.name}"></span>
-                    </div><br><br>
+            <div class="tagsDiv" th:object="${tags}">
+                <p class="postHeading"><b>Tags:</b></p>
+                <span class="postContent"
+                      th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
+            </div><br>
 
-                    <div>
-                        Email: <span th:text="${comment.email}"></span>
-                    </div><br><br>
-
-                    <div>
-                        Comment: <span th:text="${comment.comment}"></span>
-                    </div><br><br>
-                    <div class="timeDiv">
-                        <p>
-                            Created At:
-                            <span th:text="${comment.createdAt}"></span>
-                        </p>
-
-                        <p>
-                            Updated At:
-                            <span th:text="${comment.updatedAt}"></span>
-                        </p>
-                    </div>
-
-                    <a id="editCmntLink" th:href="@{/editComment}" style="display:none;">Edit comment</a><br><br>
-
-                    <a th:href="@{/deleteComment(postId=${comment.postId},commentId=${comment.id})}">Delete comment</a>
-                </div>
+            <div sec:authorize="hasRole('ROLE_admin')">
+                <input type="submit" value="Edit Post">
             </div>
-                <a th:href="@{/createComment(id=${post.id})}">Create new comment!</a>
-        </div><br><br>
-        <div>
-            <button type="button" id="editPostBtn" th:onclick="editPost();">Edit post!</button>
-        </div><br><br>
 
-        <div>
-            <a th:href="@{/deletePost(id=${post.id})}">Delete this post!</a>
-        </div><br><br>
+            <div class="editBtnDiv" sec:authorize="hasRole('ROLE_author')">
+                <input type="submit" th:if="${#authentication.name == post.author}" value="Edit post">
+            </div><br>
 
-        <div>
-            <input type="submit" id="submitBtn" style="display:none;" value="Save edited changes!">
-        </div>
+            <div sec:authorize="hasRole('ROLE_admin')">
+                <a th:href="@{/deletePost(id=${post.id})}">Delete post</a>
+            </div><br>
+
+            <div sec:authorize="hasRole('ROLE_author')">
+                <a th:if="${#authentication.name == post.author}" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
+            </div>
     </div>
 </form>
-<script th:inline="javascript">
-    function editPost() {
-        /*<![CDATA[*/
-            var title = /*[[${post.title}]]*/;
-            var content = /*[[${post.content}]]*/;
-            var author = /*[[${post.author}]]*/;
-        /*]]>*/
 
-        var inputText = document.getElementsByClassName("postTextbox");
+<h3 class="title">Comments:</h3>
+<div th:each="oldComment : ${comments}">
+    <form th:action="@{/updateComment}" th:object="${oldComment}" method="post">
+        <div class="commentsDiv">
+            <input type="hidden" th:value="${oldComment.id}" name="id">
+            <input type="hidden" th:value="${oldComment.postId}" name="postId" >
 
-        inputText[0].value = title;
-        inputText[0].style.display = "block";
+            <div>
+                <b class="postContent">Name:</b> <span th:text="${oldComment.name}"></span>
+                <input type="hidden" th:value="${oldComment.name}" name="name">
+            </div><br><br>
 
-        inputText[1].value = content;
-        inputText[1].style.display = "block";
+            <div>
+                <b class="postContent">Email:</b> <span th:text="${oldComment.email}"></span>
+                <input type="hidden" th:value="${oldComment.email}" name="email">
+            </div><br>
 
-        inputText[2].value = author;
-        inputText[2].style.display = "block";
+            <div>
+                <b class="postContent">Comment:</b> <span th:text="${oldComment.comment}"></span>
+                <input type="hidden" th:value="${oldComment.comment}" name="comment">
+            </div><br>
 
-        var editBtn = document.getElementById("editPostBtn");
-        editBtn.style.display = "none";
+            <div class="timeDiv">
+                <p>
+                    <b>Created:</b>
+                    <span class="postContent" th:text="${#temporals.format(oldComment.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
 
-        var submitBtn = document.getElementById("submitBtn");
-        submitBtn.style.display = "block";
-    }
-</script>
+                <p>
+                    <b>Last Updated:</b>
+                    <span class="postContent" th:text="${#temporals.format(oldComment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+            </div><br>
+
+            <div sec:authorize="hasRole('ROLE_admin')">
+                <input type="submit" value="Edit comment">
+                <a th:href="@{/deleteComment(postId=${post.id},commentId=${oldComment.id})}">Delete comment</a>
+            </div>
+
+            <div sec:authorize="hasRole('ROLE_author')">
+                <input type="submit" th:if="${#authentication.name == post.author}" value="Edit comment">
+                <a th:if="${#authentication.name == post.author}" th:href="@{/deleteComment(postId=${post.id},commentId=${oldComment.id})}">Delete comment</a>
+            </div><br><br>
+        </div>
+    </form>
+</div>
+<a th:href="@{/createComment(id=${post.id})}">Create new comment</a>
 </body>
 </html>
