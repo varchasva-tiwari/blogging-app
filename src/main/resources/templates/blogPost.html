@@ -5,15 +5,44 @@
     <title th:text="${post.author}  + '\'' + 's Post'"></title>
     <style>
         body {
-            padding-left: 50px;
+            font-family: monospace;
+        }
+
+        .postDiv {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: gray;
         }
 
         .title {
-            color:  #cf293a;
+            font-size: 45px;
+            font-weight: lighter;
+        }
+
+        .headerDiv {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .postContent {
+            margin-top: -20px;
+        }
+
+        .contentDiv {
+            display: flex;
+            width: 1200px;
+            height: 400px;
+            margin-top: 50px;
         }
 
         .postHeading {
-            color: #36967b;
+            font-size: 20px;
+        }
+
+        .commentHeading {
+            color: gray;
             font-size: 20px;
         }
 
@@ -21,22 +50,48 @@
             font-size: 18px;
         }
 
-        .editBtnDiv{
-            display: flex;
-            flex-direction: row;
+        .timeDiv {
+            margin-right: 820px;
+            width: 400px;
         }
 
-        #editPostBtn {
-            height: 30px;
-            background-color: #c28fc9;
-            color: white;
-            border-radius: 4px;
+        .editPostBtn {
+            width: 125px;
+            height: 45px;
+            background-color: white;
+            border: 2px solid black;
+            margin: 10px;
         }
 
-        #editPostBtn:hover {
-            background-color: #e7e7e7;
+        .editPostBtn:hover {
             cursor: pointer;
         }
+
+        .postBtnsDiv {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 90px;
+            margin-top: 10px;
+        }
+
+        a {
+             text-decoration: none;
+             color: red;
+        }
+
+        .deletePostLink {
+            padding: 30px;
+        }
+
+        .commentsDiv {
+            dislpay: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+            margin-left: 30px;
+        }
+
     </style>
 </head>
 <body>
@@ -46,101 +101,86 @@
 <form th:action="@{/updatePost}" th:object="${post}" method="post">
     <input type="hidden" th:value="${post.id}" name="id" >
     <input type="hidden" th:value="${post.excerpt}" name="excerpt">
+    <input type="hidden" th:value="${post.title}" name="title">
+    <input type="hidden" th:value="${post.content}" name="content">
     <input type="hidden" th:value="${post.isPublished}" name="published">
+    <input type="hidden" th:value="${post.publishedAt}" name="publishedAt">
+    <input type="hidden" th:value="${post.createdAt}" name="createdAt">
 
     <div class = "postDiv">
-        <div class="titleDiv">
-
-            <u class="title"><h1 th:text="${post.title}"></h1></u>
-            <input type="hidden" th:value="${post.title}" name="title">
-
-            <div class="authorDiv">
-                <p><b class="postHeading">Author: </b><span class="postContent" th:text="${post.author}"></span></p>
-                <input type="hidden" th:value="${post.author}" name="author">
-            </div>
-        </div><br>
+        <div class="headerDiv">
+            <h1 class="title" th:text="${post.title}"></h1>
+            <p class="postContent" th:text="${post.author}"></p>
+            <input type="hidden" th:value="${post.author}" name="author">
+        </div>
 
 
         <div class="contentDiv">
-            <b class="postHeading">Content:</b><br>
             <p class="postContent" th:text="${post.content}"></p>
-            <input type="hidden" th:value="${post.content}" name="content">
-        </div><br>
+        </div>
 
         <div class="timeDiv">
-                <p>
-                    <b class="postHeading">Published:</b>
-                    <span class="postContent" th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                    <input type="hidden" th:value="${post.publishedAt}" name="publishedAt">
-                </p>
-                <p>
-                    <b class="postHeading">Created:</b>
-                    <span class="postContent" th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
-                    <input type="hidden" th:value="${post.createdAt}" name="createdAt">
-                </p>
-                <p>
-                    <b class="postHeading">Last Updated:</b>
-                    <span class="postContent" th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                </p>
-            </div><br><br>
+            <p>
+                <b class="postHeading">Published:</b>
+                <span class="postContent" th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+            <p>
+                <b class="postHeading">Created:</b>
+                <span class="postContent" th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+            <p>
+                <b class="postHeading">Last Updated:</b>
+                <span class="postContent" th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+            <p class="postHeading"><b>Tags:</b>
+                <span class="postContent" th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
+            </p>
+        </div>
 
-            <div class="tagsDiv" th:object="${tags}">
-                <p class="postHeading"><b>Tags:</b></p>
-                <span class="postContent"
-                      th:each="tag : ${tags}" th:text="${tag.name} + ' '" th:value="${tag.name}"></span>
-            </div><br>
+        <div class="postBtnsDiv" sec:authorize="isAnonymous()">
+            <input type="submit" class="editPostBtn" value="Edit Post">
+            <a class="deletePostLink" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
+        </div>
 
-            <div sec:authorize="hasRole('ROLE_admin')">
-                <input type="submit" value="Edit Post">
-            </div>
+        <div class="postBtnsDiv" sec:authorize="hasRole('ROLE_admin')">
+            <input type="submit" class="editPostBtn" value="Edit Post">
+            <a class="deletePostLink" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
+        </div>
 
-            <div class="editBtnDiv" sec:authorize="hasRole('ROLE_author')">
-                <input type="submit" th:if="${#authentication.name == post.author}" value="Edit post">
-            </div><br>
-
-            <div sec:authorize="hasRole('ROLE_admin')">
-                <a th:href="@{/deletePost(id=${post.id})}">Delete post</a>
-            </div><br>
-
-            <div sec:authorize="hasRole('ROLE_author')">
-                <a th:if="${#authentication.name == post.author}" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
-            </div>
+        <div class="postBtnsDiv" sec:authorize="hasRole('ROLE_author')">
+            <input type="submit" class="editPostBtn" th:if="${#authentication.name == post.author}" value="Edit post">
+            <a class="deletePostLink" th:if="${#authentication.name == post.author}" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
+        </div>
     </div>
 </form>
 
-<h3 class="title">Comments:</h3>
+<div class="commentsDiv">
 <div th:each="oldComment : ${comments}">
     <form th:action="@{/updateComment}" th:object="${oldComment}" method="post">
         <div class="commentsDiv">
             <input type="hidden" th:value="${oldComment.id}" name="id">
-            <input type="hidden" th:value="${oldComment.postId}" name="postId" >
+            <input type="hidden" th:value="${oldComment.postId}" name="postId">
+            <input type="hidden" th:value="${oldComment.name}" name="name">
+            <input type="hidden" th:value="${oldComment.email}" name="email">
+            <input type="hidden" th:value="${oldComment.comment}" name="comment">
 
-            <div>
-                <b class="postContent">Name:</b> <span th:text="${oldComment.name}"></span>
-                <input type="hidden" th:value="${oldComment.name}" name="name">
-            </div><br><br>
+            <h3 class="title">Comments:</h3>
 
-            <div>
-                <b class="postContent">Email:</b> <span th:text="${oldComment.email}"></span>
-                <input type="hidden" th:value="${oldComment.email}" name="email">
-            </div><br>
+            <b class="postContent">Name:</b><p th:text="${oldComment.name}"></p>
 
-            <div>
-                <b class="postContent">Comment:</b> <span th:text="${oldComment.comment}"></span>
-                <input type="hidden" th:value="${oldComment.comment}" name="comment">
-            </div><br>
+            <b class="postContent">Email:</b><p th:text="${oldComment.email}"></p>
 
-            <div class="timeDiv">
-                <p>
-                    <b>Created:</b>
-                    <span class="postContent" th:text="${#temporals.format(oldComment.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
-                </p>
+            <b class="postContent">Comment:</b><p th:text="${oldComment.comment}"></p>
 
-                <p>
-                    <b>Last Updated:</b>
-                    <span class="postContent" th:text="${#temporals.format(oldComment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                </p>
-            </div><br>
+            <p>
+                <b class="commentHeading">Created:</b>
+                <span class="postContent" th:text="${#temporals.format(oldComment.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+
+            <p>
+                <b class="commentHeading">Last Updated:</b>
+                <span class="postContent" th:text="${#temporals.format(oldComment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
 
             <div sec:authorize="hasRole('ROLE_admin')">
                 <input type="submit" value="Edit comment">
@@ -154,6 +194,8 @@
         </div>
     </form>
 </div>
+</div>
+
 <a th:href="@{/createComment(id=${post.id})}">Create new comment</a>
 </body>
 </html>

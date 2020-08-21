@@ -34,16 +34,17 @@ public class PostController {
     private UserService userService;
 
     @GetMapping("/showPostForm")
-    private String showPostForm(Model model) {
+    private String showForm(Model model) {
         String newTags = null;
         model.addAttribute("post", new Post());
         model.addAttribute("oldTags", tagService.read());
         model.addAttribute("newTags", newTags);
+
         return "postForm";
     }
 
     @PostMapping ("/createPost")
-    private String createOrUpdatePost(@ModelAttribute("post") Post post, @ModelAttribute("newTags") String tags, Principal principal, Model model) {
+    private String createOrUpdate(@ModelAttribute("post") Post post, @ModelAttribute("newTags") String tags, Principal principal, Model model) {
             if(postService.exists(post)) {
                 post.setAuthor(principal.getName());
                 postService.update(post);
@@ -89,7 +90,7 @@ public class PostController {
 
         List<Post> posts = new ArrayList<>();
 
-        if(pageNo != null) {
+        /*if(pageNo != null) {
             if(sortField != null) {
                 page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
             }
@@ -103,7 +104,54 @@ public class PostController {
             if(sortField != null) {
                 posts = postService.getSorted(sortField, sortOrder);
             }
-        }
+        }*/
+
+        page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
+        posts = page.getContent();
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalPosts", page.getTotalElements());
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("keyword", null);
+
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+
+        model.addAttribute("postTags", postTags);
+
+        return "blogs";
+    }
+
+    /*@RequestMapping(value = "/readPosts", params = "search")
+    private String search(@RequestParam("search") String keyword, Model model) {
+        List<Post> posts = postService.getAllByKeyword(keyword);
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+
+        model.addAttribute("postTags", postTags);
+        model.addAttribute("posts", posts);
+
+        return "blogs";
+    }*/
+
+    @RequestMapping("/searchPosts")
+    private String search(Model model, @RequestParam("search") String keyword) {
+        return getPaginatedSearch( keyword,1, 10,"publishedAt", "asc", model);
+    }
+
+    @RequestMapping(value = "/readPosts", params = "search")
+    private String getPaginatedSearch(String keyword,
+                          @RequestParam(value = "start", required = false) Integer pageNo,
+                          @RequestParam(value = "limit", required = false) Integer pageSize,
+                          @RequestParam(value = "sortField", required = false) String sortField,
+                          @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                          Model model) {
+
+        System.out.println(pageNo+","+pageSize+","+sortField+","+sortOrder);
+
+        Page page = postService.getAllByKeyword(pageNo, pageSize, sortField, sortOrder, keyword);
+        List<Post> posts = page.getContent();
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
@@ -111,27 +159,16 @@ public class PostController {
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalPosts", page.getTotalElements());
         model.addAttribute("sortField", sortField);
-
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
-
         model.addAttribute("postTags", postTags);
         model.addAttribute("posts", posts);
+        model.addAttribute("keyword", keyword);
 
-        return "blogs";
-    }
 
-    @RequestMapping(value = "/readPosts", params = "search")
-    private String searchPosts(@RequestParam("search") String keyword, Model model) {
-        List<Post> posts = postService.getAllByKeyword(keyword);
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
-
-        model.addAttribute("postTags", postTags);
-        model.addAttribute("posts", posts);
         return "blogs";
     }
 
     @RequestMapping("/updatePost")
-    private String updatePostForm(@ModelAttribute("post") Post post, Model model) {
+    private String updateForm(@ModelAttribute("post") Post post, Model model) {
         List<Tag> newTags = postTagService.readTags(post.getId());
 
         String newTagNames = "";
@@ -147,7 +184,7 @@ public class PostController {
     }
 
     @RequestMapping("/deletePost")
-    private String deletePost(@RequestParam("id") int postId) {
+    private String delete(@RequestParam("id") int postId) {
         commentService.deleteComments(postId);
         postService.delete(postId);
         postTagService.delete(postId);
@@ -159,7 +196,10 @@ public class PostController {
                           @RequestParam(value = "dateTime", required = false) String dateTime,
                           @RequestParam(value = "tags", required = false) String tags,
                           Model model) {
-        model.addAttribute("posts", postService.filter(author, dateTime, tags));
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(postService.filter(author, dateTime, tags));
+
+        model.addAttribute("postTags", postTags);
+
         return "blogs";
     }
 }

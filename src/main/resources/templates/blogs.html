@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title th:text="'Blogs'"></title>
@@ -21,76 +21,153 @@
         }
 
         .filterDiv{
-            width: 600px;
-            border: 2px solid black;
+            display: flex;
+            flex-direction: column;
         }
 
         fieldset {
             width: 100px;
+        }
+
+        .postDiv {
+            border: 2px solid gray;
+        }
+
+        #search {
+            border-radius: 15px;
+            width: 150px;
+            height: 25px;
+            padding-left: 10px;
+        }
+
+        #submitBtn {
+            width: 60px;
+            height: 30px;
+            background-color: white;
+            border: 2px solid gray;
+        }
+
+
+        #filterBtn {
+            width: 100px;
+            height: 30px;
+            background-color: white;
+            border: 2px solid gray;
+        }
+
+        .Btn:hover {
+            cursor: pointer;
+        }
+
+        .searchDiv {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 300px;
+        }
+        .headerDiv {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .loginLogout {
+            margin-left: 850px;
+        }
+
+        #login {
+            color: cornflowerblue;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        #logout {
+            width: 60px;
+            height: 30px;
+            background-color: white;
+            border: 2px solid gray;
         }
     </style>
 </head>
 <body>
 
 <a th:href="@{/home}">Back to Home</a><br><br>
+<div class="headerDiv">
+    <form th:action="@{/searchPosts(search=${search},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}" class="searchDiv">
+        <div>
+            <input type="text" th:value="${search}" name="search" id="search" placeholder="Enter keywords"><br><br>
+            <input type="submit" class="Btn" id="submitBtn" value="Search!">
+        </div>
+    </form><br>
 
-Search posts by keywords:
-<form th:action="@{/readPosts(search=${search})}">
-    <input type="text" th:value="${search}" name="search"><br><br>
-    <input type="submit" value="Search!">
-</form><br>
+    <div class="loginLogout">
+        <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}">
+                <input type="submit" id="logout" value="Logout">
+            </form>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a id="login" th:href="@{/login}">Login</a>
+        </div>
+    </div>
+</div>
+<div class="filterDiv">
+    <h3>Filter Posts:</h3>
+    <fieldset>
+        <form th:action="@{/filter(author=${author},dateTime=${dateTime},tags=${tags})}">
+            <input type="text" th:value="${author}" name="author" placeholder="By Author"><br><br>
+            <input type="datetime-local" th:value="${dateTime}" name="dateTime"><br><br>
+            <input type="text" th:value="${tags}" name="tags" placeholder="By Tags"><br><br>
+            <input type="submit" class="Btn" id="filterBtn" value="Filter posts!">
+        </form>
+    </fieldset><br><br>
+</div>
 
-<div th:if="${sortField != null}">
-    Sort posts by:
+Sort posts by:
+<div th:if="${keyword!=null}">
+    <a th:href="@{/searchPosts(search=${keyword},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Oldest First</a>
+    <a th:href="@{/searchPosts(search=${keyword},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Newest First</a><br><br>
+</div>
+
+<div th:unless="${keyword!=null}">
     <a th:href="@{/readPosts(start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Oldest First</a>
     <a th:href="@{/readPosts(start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=desc)}">Newest First</a><br><br>
-</div><br>
+</div>
 
-<h3>Filter Posts:</h3>
-<fieldset>
-    <form th:action="@{/filter(author=${author}, dateTime=${dateTime}, tags=${tags})}">
-        <input type="text" th:value="${author}" name="author" placeholder="By Author"><br><br>
-        <input type="datetime-local" th:value="${dateTime}" name="dateTime"><br><br>
-        <input type="text" th:value="${tags}" name="tags" placeholder="By Tags"><br><br>
-        <input type="submit" value="Filter posts!">
-    </form>
-</fieldset><br><br>
+
 
 <a th:href="@{/readPosts}">Refresh</a><br><br>
-
-
-    <div th:each="postTag : ${postTags}">
-        <div class = "postDiv" th:>
-            <div class="titleDiv">
-                <a class="title" th:href="@{/readPost(id=${post.id})}"><h2 class="title" th:text="${post.title}"></h2></a>
+<div th:each="postTag : ${postTags}">
+    <div class = "postDiv" th:with="post=${postTag.key}">
+        <div class="titleDiv">
+            <a class="title" th:href="@{/readPost(id=${post.id})}"><h2 class="title" th:text="${post.title}"></h2></a>
+        </div>
+        <div class="excerptDiv">
+            <b class="postHeading">Excerpt:</b>
+            <p th:text="${post.excerpt}"></p>
+        </div>
+        <div class="authorTimeDiv">
+            <div class="authorDiv">
+                <b class="postHeading">Author:</b>
+                <p th:text="${post.author}"></p>
             </div>
-            <div class="excerptDiv">
-                <b class="postHeading">Excerpt:</b>
-                <p th:text="${post.excerpt}"></p>
-            </div>
-            <div class="authorTimeDiv">
-                <div class="authorDiv">
-                    <b class="postHeading">Author:</b>
-                    <p th:text="${post.author}"></p>
+            <div class="timeDiv">
+                <p>
+                    <b class="postHeading">Published At:</b>
+                    <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+                <p>
+                    <b class="postHeading">Created At:</b>
+                    <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+                <p>
+                    <b class="postHeading">Updated At:</b>
+                    <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
                 </div>
-                <div class="timeDiv">
-                    <p>
-                        <b class="postHeading">Published At:</b>
-                        <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                    </p>
-                    <p>
-                        <b class="postHeading">Created At:</b>
-                        <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
-                    </p>
-                    <p>
-                        <b class="postHeading">Updated At:</b>
-                        <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                    </p>
-                </div><br>
-                Tags:
-                <div th:each="tag : ${postTag.value}">
-                    <span th:text="${tag.name}"></span>
-                </div>
+            <p>
+                <b class="postHeading">Tags: </b>
+                <span th:each="tag : ${postTag.value}" th:text="${tag.name}+' '"></span>
+            </p>
             </div>
         </div>
     </div><br>
