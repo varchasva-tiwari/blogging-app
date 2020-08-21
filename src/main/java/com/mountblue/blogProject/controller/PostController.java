@@ -86,28 +86,12 @@ public class PostController {
                              @RequestParam(value = "sortOrder", required = false) String sortOrder,
                                 Model model) {
 
-        Page page = null;
-
         List<Post> posts = new ArrayList<>();
 
-        /*if(pageNo != null) {
-            if(sortField != null) {
-                page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
-            }
-            else {
-                page = postService.getPaginated(pageNo, pageSize);
-            }
-            posts = page.getContent();
-        }
+        Page page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
 
-        else {
-            if(sortField != null) {
-                posts = postService.getSorted(sortField, sortOrder);
-            }
-        }*/
-
-        page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
         posts = page.getContent();
+
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
         model.addAttribute("currentTotalPosts", page.getNumberOfElements());
@@ -123,34 +107,19 @@ public class PostController {
         return "blogs";
     }
 
-    /*@RequestMapping(value = "/readPosts", params = "search")
-    private String search(@RequestParam("search") String keyword, Model model) {
-        List<Post> posts = postService.getAllByKeyword(keyword);
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
-
-        model.addAttribute("postTags", postTags);
-        model.addAttribute("posts", posts);
-
-        return "blogs";
-    }*/
-
-    @RequestMapping("/searchPosts")
-    private String search(Model model, @RequestParam("search") String keyword) {
-        return getPaginatedSearch( keyword,1, 10,"publishedAt", "asc", model);
-    }
-
-    @RequestMapping(value = "/readPosts", params = "search")
-    private String getPaginatedSearch(String keyword,
+    @RequestMapping(value = "/searchPosts")
+    private String getPaginatedSearch(@RequestParam("search") String keyword,
                           @RequestParam(value = "start", required = false) Integer pageNo,
                           @RequestParam(value = "limit", required = false) Integer pageSize,
                           @RequestParam(value = "sortField", required = false) String sortField,
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
                           Model model) {
-
-        System.out.println(pageNo+","+pageSize+","+sortField+","+sortOrder);
+        System.out.println(pageNo+","+pageSize+","+sortField+","+sortOrder+","+keyword);
 
         Page page = postService.getAllByKeyword(pageNo, pageSize, sortField, sortOrder, keyword);
+
         List<Post> posts = page.getContent();
+
         LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
 
         model.addAttribute("currentPage", pageNo);

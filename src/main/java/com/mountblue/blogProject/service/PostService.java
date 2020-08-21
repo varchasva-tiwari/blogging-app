@@ -74,10 +74,6 @@ public class PostService {
         return postRepository.findAll(pageable);
     }
 
-    /*public List<Post> getAllByKeyword(String word) {
-        return postRepository.getPosts(word);
-    }*/
-
     public Page<Post> getAllByKeyword(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);

@@ -92,9 +92,13 @@
 
 <a th:href="@{/home}">Back to Home</a><br><br>
 <div class="headerDiv">
-    <form th:action="@{/searchPosts(search=${search},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}" class="searchDiv">
+    <form th:action="@{/searchPosts}" class="searchDiv">
         <div>
-            <input type="text" th:value="${search}" name="search" id="search" placeholder="Enter keywords"><br><br>
+            <input type="text" th:value="${search}" th:name="search" id="search" placeholder="Enter keywords"><br><br>
+            <input type="hidden" th:value="${currentPage}" th:name="start">
+            <input type="hidden" th:value="${pageSize}" th:name="limit">
+            <input type="hidden" th:value="publishedAt" th:name="sortField">
+            <input type="hidden" th:value="asc" th:name="sortOrder">
             <input type="submit" class="Btn" id="submitBtn" value="Search!">
         </div>
     </form><br>
@@ -125,7 +129,7 @@
 Sort posts by:
 <div th:if="${keyword!=null}">
     <a th:href="@{/searchPosts(search=${keyword},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Oldest First</a>
-    <a th:href="@{/searchPosts(search=${keyword},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Newest First</a><br><br>
+    <a th:href="@{/searchPosts(search=${keyword},start=${currentPage},limit=${pageSize},sortField=publishedAt,sortOrder=desc)}">Newest First</a><br><br>
 </div>
 
 <div th:unless="${keyword!=null}">
