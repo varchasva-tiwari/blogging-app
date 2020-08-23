@@ -1,0 +1,431 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.3 (Ubuntu 12.3-1.pgdg20.04+1)
+-- Dumped by pg_dump version 12.3 (Ubuntu 12.3-1.pgdg20.04+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.comments (
+    id integer NOT NULL,
+    name character varying(30) NOT NULL,
+    email character varying(40) NOT NULL,
+    comment character varying(800) NOT NULL,
+    post_id integer NOT NULL,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone,
+    user_id integer
+);
+
+
+ALTER TABLE public.comments OWNER TO postgres;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.comments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comments_id_seq OWNER TO postgres;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
+
+
+--
+-- Name: hibernate_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.hibernate_sequence
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.hibernate_sequence OWNER TO postgres;
+
+--
+-- Name: post_tags; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.post_tags (
+    post_id integer NOT NULL,
+    tag_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.post_tags OWNER TO postgres;
+
+--
+-- Name: posts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.posts (
+    id integer NOT NULL,
+    title character varying(50) NOT NULL,
+    excerpt character varying(300) NOT NULL,
+    content character varying(1000) NOT NULL,
+    author character varying(30) NOT NULL,
+    published_at timestamp without time zone NOT NULL,
+    is_published boolean NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.posts OWNER TO postgres;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.posts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.posts_id_seq OWNER TO postgres;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tags (
+    id integer NOT NULL,
+    name character varying(20) NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.tags OWNER TO postgres;
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tags_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tags_id_seq OWNER TO postgres;
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name character varying(15) NOT NULL,
+    email character varying(25) NOT NULL,
+    password character varying(15) NOT NULL,
+    role character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: comments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq'::regclass);
+
+
+--
+-- Name: posts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
+
+
+--
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.comments (id, name, email, comment, post_id, created_at, updated_at, user_id) FROM stdin;
+17	Lucey	lucey@gmail.com	This is Lucey	28	2020-08-20 07:55:43.060824+05:30	2020-08-20 07:55:43.060861+05:30	0
+27	Rahul	rahul@gmail.com	This is Rahul	34	2020-08-21 12:28:14.204437+05:30	2020-08-21 12:28:14.2045+05:30	0
+28	varchasva	varchasva@gmail.com	This is varchasva	37	2020-08-21 12:29:11.978523+05:30	2020-08-21 12:29:11.978553+05:30	5
+29	Rahul	rahul@gmail.com	This is comment	28	2020-08-21 12:47:57.42466+05:30	2020-08-21 12:47:57.424737+05:30	0
+30	Rahul	rahul@gmail.com	uyugy	25	2020-08-21 13:24:28.329778+05:30	2020-08-21 13:24:28.329815+05:30	0
+31	Palash	palash@gmail.com	This is Palash	28	2020-08-22 16:24:59.906185+05:30	2020-08-22 16:24:59.906256+05:30	0
+\.
+
+
+--
+-- Data for Name: post_tags; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
+28	10	\N	\N
+28	14	\N	\N
+31	10	\N	\N
+31	11	\N	\N
+34	10	\N	\N
+34	12	\N	\N
+35	13	\N	\N
+35	11	\N	\N
+35	10	\N	\N
+36	11	\N	\N
+36	10	\N	\N
+37	12	\N	\N
+37	11	\N	\N
+38	10	\N	\N
+38	12	\N	\N
+38	14	\N	\N
+39	12	\N	\N
+39	11	\N	\N
+39	10	\N	\N
+40	11	\N	\N
+40	12	\N	\N
+40	13	\N	\N
+40	10	\N	\N
+42	10	\N	\N
+42	11	\N	\N
+42	13	\N	\N
+43	15	\N	\N
+43	16	\N	\N
+45	11	\N	\N
+45	12	\N	\N
+45	16	\N	\N
+\.
+
+
+--
+-- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.posts (id, title, excerpt, content, author, published_at, is_published, created_at, updated_at, user_id) FROM stdin;
+28	Big galaxies	Struggles	Life	admin	2020-08-19 20:52:23.533214	t	2020-08-19 20:52:23.533273	2020-08-19 20:52:23.533293	4
+31	Blog 3	blog	blog	Sachin	2020-08-20 12:14:35.369812	t	2020-08-20 12:14:35.369853	2020-08-20 12:14:35.369871	7
+34	Blog 5	Blog 5 	Blog 5	lucifer	2020-08-21 09:01:35.812968	t	2020-08-21 09:01:35.81302	2020-08-21 09:01:35.813038	6
+35	Blog 6	Blog 6	Blog 6	lucifer	2020-08-21 09:02:03.330117	t	2020-08-21 09:02:03.330151	2020-08-21 09:02:03.330167	6
+36	Blog 7	Blog 7	Blog 7	lucifer	2020-08-21 09:02:19.367875	t	2020-08-21 09:02:19.367898	2020-08-21 09:02:19.367907	6
+37	Blog 8	Blog 8	Blog 8	lucifer	2020-08-21 09:02:38.708792	t	2020-08-21 09:02:38.708828	2020-08-21 09:02:38.708842	6
+38	Blog 9	Blog 9	Blog 9	lucifer	2020-08-21 09:03:11.315533	t	2020-08-21 09:03:11.315557	2020-08-21 09:03:11.315566	6
+39	Blog 10	Blog 10	Blog 10	lucifer	2020-08-21 09:03:32.193683	t	2020-08-21 09:03:32.193711	2020-08-21 09:03:32.193719	6
+40	Blog 11	Blog 11	Blog 11	lucifer	2020-08-21 09:03:49.176796	t	2020-08-21 09:03:49.176825	2020-08-21 09:03:49.176838	6
+42	Computer Science	this is cs	this is cs	Rahul	2020-08-21 13:42:37.878076	t	2020-08-21 13:42:37.878116	2020-08-21 13:42:37.878127	8
+43	Computer Science	CS	This is CS blog	Rahul	2020-08-22 16:20:08.418915	t	2020-08-22 16:20:08.418974	2020-08-22 16:20:08.418994	8
+45	Blog 9	This is excerpt	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.	VVS	2020-08-23 13:14:48.751263	t	2020-08-23 13:14:48.751306	2020-08-23 13:14:48.751344	9
+\.
+
+
+--
+-- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tags (id, name, created_at, updated_at) FROM stdin;
+10	life	2020-08-18 15:03:19.364905+05:30	\N
+11	lifestyle	2020-08-18 15:03:19.411086+05:30	\N
+12	sports	2020-08-18 16:00:36.769118+05:30	\N
+13	cricket	2020-08-18 16:00:36.793726+05:30	\N
+14	galaxies	2020-08-19 20:52:23.612464+05:30	\N
+15	cs	2020-08-21 12:56:00.9971+05:30	\N
+16	computers	2020-08-22 16:20:08.527028+05:30	\N
+17	history	2020-08-22 16:28:55.119426+05:30	\N
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, name, email, password, role) FROM stdin;
+4	admin	admin@gmail.com	admin	ROLE_admin
+5	varchasva	varchasva@gmail.com	varchasva	ROLE_author
+6	lucifer	lucifer@gmail.com	lucifer	ROLE_author
+7	Sachin	sachin@gmail.com	sachin	ROLE_author
+8	Rahul	rahul@gmail.com	rahul	ROLE_author
+9	VVS	vvs@gmail.com	vvs	ROLE_author
+\.
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.comments_id_seq', 31, true);
+
+
+--
+-- Name: hibernate_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.hibernate_sequence', 1, false);
+
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.posts_id_seq', 45, true);
+
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tags_id_seq', 17, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 9, true);
+
+
+--
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_tags post_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.post_tags
+    ADD CONSTRAINT post_tags_pkey PRIMARY KEY (post_id, tag_id);
+
+
+--
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.posts
+    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tags tags_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_name_key UNIQUE (name);
+
+
+--
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
