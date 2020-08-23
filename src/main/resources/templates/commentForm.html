@@ -32,7 +32,7 @@
 </head>
 <body>
     <a th:href="@{/readPosts}">Back to Blogs</a><br><br>
-    <a th:href="@{/home}">Back to Home</a><br><br>
+    <a th:href="@{/}">Back to Home</a><br><br>
     <fieldset>
     <form th:action="@{/createComment}" th:object="${newComment}" method="post">
         <input type="hidden" th:value="${newComment.postId}" name="postId">
