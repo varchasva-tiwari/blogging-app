@@ -60,17 +60,13 @@ public class PostService {
         return postRepository.findAll(pageable);
     }
 
-    public Page<Post> getAllByKeyword(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
+    public Page<Post> search(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
         return postRepository.search(word, pageable);
     }
 
-    public boolean exists(Post post) {
-        return postRepository.existsById(post.getId());
-    }
-
-    public List<Post> searchAndFilter(String keyword, String author, String dateTime, String tags) {
+    public Page<Post> filter(int pageNo, int pageSize, String author, String dateTime, String tags) {
         String publishedAt = "";
         List<String> tagNames = new ArrayList<>();
 
@@ -82,6 +78,28 @@ public class PostService {
             tagNames =  Arrays.asList(tags.split(", "));
         }
 
-        return postRepository.searchAndFilter(keyword, author, publishedAt, tagNames);
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+        return postRepository.filter(author, publishedAt, tagNames, pageable);
     }
+
+    public Page<Post> searchAndFilter(int pageNo, int pageSize, String keyword, String author, String dateTime, String tags) {
+        String publishedAt = "";
+        List<String> tagNames = new ArrayList<>();
+
+        if(!dateTime.equals("")) {
+            publishedAt = dateTime.replace('T', ' ');
+        }
+
+        if(!tags.equals("")) {
+            tagNames =  Arrays.asList(tags.split(", "));
+        }
+
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+        return postRepository.searchAndFilter(keyword, author, publishedAt, tagNames, pageable);
+    }
+
+    public boolean exists(Post post) {
+        return postRepository.existsById(post.getId());
+    }
+
 }

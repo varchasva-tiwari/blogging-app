@@ -15,10 +15,10 @@ public interface PostTagRepository extends JpaRepository<PostTag,Integer> {
     @Modifying
     @Transactional
     @Query(value = "INSERT into post_tags (post_id, tag_id) VALUES(:postId, :tagId)", nativeQuery = true)
-    public void create(@Param("postId") int postId, @Param("tagId") int tagId);
+    public void savePostTag(@Param("postId") int postId, @Param("tagId") int tagId);
 
     @Query("SELECT pt FROM PostTag pt WHERE pt.postId  = :postId")
-    List<PostTag> readTags(@Param("postId") int postId);
+    List<PostTag> getTags(@Param("postId") int postId);
 
     @Modifying
     @Transactional

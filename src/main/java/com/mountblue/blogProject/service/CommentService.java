@@ -20,7 +20,7 @@ public class CommentService {
     }
 
     public List<Comment> read(int postId) {
-        return commentRepository.read(postId);
+        return commentRepository.getComments(postId);
     }
 
     public void update(Comment comment) {
@@ -35,12 +35,12 @@ public class CommentService {
     }
 
     public void deleteComments(int postId) {
-        if(commentRepository.read(postId).size() > 0)
+        if(commentRepository.getComments(postId).size() > 0)
             commentRepository.deleteById(postId);
     }
 
     public void delete(int postId, int commentId) {
-        commentRepository.delete(postId, commentId);
+        commentRepository.deleteComment(postId, commentId);
     }
 
     public boolean exists(Comment comment) {

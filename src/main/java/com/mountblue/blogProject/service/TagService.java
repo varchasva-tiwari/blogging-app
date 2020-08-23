@@ -15,15 +15,15 @@ public class TagService {
     @Autowired
     private TagRepository tagRepository;
 
-    public void create(List<Tag> tags) {
+    public void saveTags(List<Tag> tags) {
         tagRepository.saveAll(tags);
     }
 
-    public List<Tag> read() {
+    public List<Tag> getTags() {
         return tagRepository.findAll();
     }
 
-    public List<Integer> update(String tags) {
+    public List<Integer> updateTags(String tags) {
         List<String> tagNames = Arrays.asList(tags.split(", "));
 
         List<Integer> newTagIds = new ArrayList<>();

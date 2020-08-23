@@ -37,7 +37,7 @@ public class PostController {
     private String showForm(Model model) {
         String newTags = null;
         model.addAttribute("post", new Post());
-        model.addAttribute("oldTags", tagService.read());
+        model.addAttribute("oldTags", tagService.getTags());
         model.addAttribute("newTags", newTags);
 
         return "postForm";
@@ -50,14 +50,14 @@ public class PostController {
             if(postService.exists(post)) {
                 post.setAuthor(principal.getName());
                 postService.update(post);
-                List<Integer> newTagIds = tagService.update(tags);
+                List<Integer> newTagIds = tagService.updateTags(tags);
                 postTagService.create(post.getId(), newTagIds);
             } else {
                 post.setAuthor(principal.getName());
                 post.setUserId(userService.getId(principal.getName()));
                 postService.create(post);
 
-                List<Integer> newTagIds = tagService.update(tags);
+                List<Integer> newTagIds = tagService.updateTags(tags);
                 postTagService.create(post.getId(), newTagIds);
             }
 
@@ -113,7 +113,7 @@ public class PostController {
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
                           Model model) {
 
-        Page page = postService.getAllByKeyword(pageNo, pageSize, sortField, sortOrder, keyword);
+        Page page = postService.search(pageNo, pageSize, sortField, sortOrder, keyword);
 
         List<Post> posts = page.getContent();
 
@@ -142,7 +142,7 @@ public class PostController {
         }
 
         model.addAttribute("post", post);
-        model.addAttribute("oldTags", tagService.read());
+        model.addAttribute("oldTags", tagService.getTags());
         model.addAttribute("newTags", newTagNames);
 
         return "postForm";
@@ -157,14 +157,36 @@ public class PostController {
     }
 
     @RequestMapping("/filter")
-    private String filter(@RequestParam(value = "search", required = false) String keyword,
+    private String filter(@RequestParam(value = "start", required = false) Integer pageNo,
+                          @RequestParam(value = "limit", required = false) Integer pageSize,
+                          @RequestParam(value = "search", required = false) String keyword,
                           @RequestParam(value = "author", required = false) String author,
                           @RequestParam(value = "dateTime", required = false) String dateTime,
                           @RequestParam(value = "tags", required = false) String tags,
                           Model model) {
 
-        LinkedHashMap<Post,List<Tag>> newPostTags = postTagService.getPostTags(postService.searchAndFilter(keyword, author, dateTime, tags));
-        model.addAttribute("postTags", newPostTags);
+        Page page = null;
+
+        if(keyword != null) {
+            page = postService.searchAndFilter(pageNo, pageSize, keyword, author, dateTime, tags);
+        } else {
+            page = postService.filter(pageNo, pageSize, author, dateTime, tags);
+        }
+
+        List<Post> posts = page.getContent();
+
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalPosts", page.getTotalElements());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("author", author);
+        model.addAttribute("dateTime", dateTime);
+        model.addAttribute("tags", tags);
+        model.addAttribute("postTags", postTags);
 
         return "blogs";
     }

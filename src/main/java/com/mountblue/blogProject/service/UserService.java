@@ -29,7 +29,7 @@ public class UserService implements org.springframework.security.core.userdetail
         return userRepository.getId(name);
     }
 
-    public void create(User user) {
+    public void save(User user) {
         user.setRole("ROLE_author");
         userRepository.save(user);
     }

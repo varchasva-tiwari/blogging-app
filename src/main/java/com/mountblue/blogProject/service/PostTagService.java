@@ -23,12 +23,12 @@ public class PostTagService {
     public void create(int postId, List<Integer> tagIds) {
         tagIds.forEach(tagId -> {
             if(postTagRepository.containsTag(postId, tagId).isEmpty())
-                postTagRepository.create(postId, tagId);
+                postTagRepository.savePostTag(postId, tagId);
         });
     }
 
     public List<Tag> readTags(int postId) {
-         List<PostTag> postTags = postTagRepository.readTags(postId);
+         List<PostTag> postTags = postTagRepository.getTags(postId);
 
          List<Tag> tags = new ArrayList<>();
 

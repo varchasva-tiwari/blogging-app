@@ -20,7 +20,7 @@ public class CommentController {
     private UserService userService;
 
     @GetMapping("/createComment")
-    public String showCommentForm(@RequestParam("id") int postId, Model model) {
+    public String showCommentsForm(@RequestParam("id") int postId, Model model) {
         Comment comment = new Comment();
         comment.setPostId(postId);
 
@@ -29,7 +29,7 @@ public class CommentController {
     }
 
     @PostMapping("/createComment")
-    public String createComment(@ModelAttribute("newComment") Comment newComment, Principal principal) {
+    public String saveComment(@ModelAttribute("newComment") Comment newComment, Principal principal) {
         if(commentService.exists(newComment)) {
             commentService.update(newComment);
         }
@@ -48,7 +48,7 @@ public class CommentController {
     }
 
     @RequestMapping("/updateComment")
-    public String updateCommentForm(@ModelAttribute("oldComment") Comment comment, Model model) {
+    public String editCommentForm(@ModelAttribute("oldComment") Comment comment, Model model) {
         model.addAttribute("newComment", comment);
         return "commentForm";
     }

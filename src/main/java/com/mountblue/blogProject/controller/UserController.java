@@ -23,7 +23,7 @@ public class UserController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute("newUser") User user) {
-        userService.create(user);
+        userService.save(user);
         return "login";
     }
 }

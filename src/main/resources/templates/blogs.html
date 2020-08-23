@@ -142,6 +142,8 @@
     <fieldset>
         <form th:action="@{/filter}">
             <input type="hidden" th:value="${keyword}" name="search">
+            <input type="hidden" th:value="${currentPage}" name="start">
+            <input type="hidden" th:value="${pageSize}" name="limit">
             <input type="text" th:value="${author}" name="author" placeholder="By Author"><br><br>
             <input type="datetime-local" th:value="${dateTime}" name="dateTime"><br><br>
             <input type="text" th:value="${tags}" name="tags" placeholder="By Tags"><br><br>
@@ -165,7 +167,7 @@ Sort posts by:
 
 
 
-<a th:href="@{/readPosts}">Clear Filters</a><br><br>
+<a th:href="@{/readPosts}">Clear Results</a><br><br>
 <div th:each="postTag : ${postTags}">
     <div class = "postDiv" th:with="post=${postTag.key}">
         <div class="titleDiv">
@@ -184,14 +186,6 @@ Sort posts by:
                 <p>
                     <b class="postHeading">Published At:</b>
                     <span th:text="${#temporals.format(post.publishedAt, 'dd-MM-yyyy HH:mm')}"></span>
-                </p>
-                <p>
-                    <b class="postHeading">Created At:</b>
-                    <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
-                </p>
-                <p>
-                    <b class="postHeading">Updated At:</b>
-                    <span th:text="${#temporals.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
                 </div>
             <p>
