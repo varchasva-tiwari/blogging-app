@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Login Page'"></title>
+    <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-family: monospace;
+                color: gray;
+            }
+
+            .formDiv {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 80px;
+                width: 500px;
+                height: auto;
+            }
+
+            .nameDiv {
+                margin: 10px;
+            }
+
+            .passDiv {
+                margin: 10px;
+            }
+
+            .submitDiv {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                margin-top: 40px;
+                margin-bottom: 10px;
+            }
+
+            .submitBtn {
+                width: 125px;
+                height: 55px;
+                background-color: white;
+                border: 2px solid black;
+            }
+
+            .submitBtn:hover {
+                cursor: pointer;
+            }
+
+            .registerDiv {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                margin-top: 40px;
+                margin-bottom: 10px;
+            }
+
+            .textBox {
+                width: 250px;
+                height: 40px;
+                border: 2px solid black;
+            }
+
+            h1 {
+                font-size: 45px;
+                font-weight: lighter;
+            }
+
+            .error {
+                color: red;
+            }
+        </style>
+</head>
+<body>
+    <div class="formDiv">
+        <h1>Login</h1>
+        <form th:action="@{/login}" method="post">
+            <div class="nameDiv">
+                <input type="text" placeholder="Enter email" class="textBox" id="username" name="username">
+            </div>
+            <div class="passDiv">
+                <input type="password" placeholder="Enter password" class="textBox" id="password" name="password">
+            </div>
+            <div class="submitDiv">
+                <input type="submit" value="Submit" class="submitBtn">
+            </div>
+            <div class="registerDiv">
+                <p>Don't have an account? <a th:href="@{/register}">Create one</a></p>
+            </div>
+            <div th:if="${param.error}" class="error">
+                Invalid username and/or password!
+            </div>
+            <div th:if="${param.logout}" class="success">
+                You have been logged out!
+            </div>
+        </form>
+    </div>
+</body>
+</html>
