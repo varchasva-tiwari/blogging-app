@@ -1,21 +1,10 @@
 package com.mountblue.blogProject.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.util.List;
 
 @Entity
 @Table(name="users")
 public class User {
-    private static final String NAME_EMPTY = "Name cannot not be empty";
-    private static final String EMAIL_EMPTY = "Email cannot not be empty";
-    private static final String ROLE_EMPTY = "Role cannot not be empty";
-    private static final String EMAIL_WRONG_FORMAT = "Enter email in proper format";
-    private static final String PASSWORD_EMPTY = "Password cannot be empty";
-    private static final String NAME_EXCEEDED = "Name  cannot exceed 30 characters";
-    private static final String EMAIL_EXCEEDED = "Email cannot exceed 40 characters";
-    private static final String PASSWORD_EXCEEDED = "Password cannot exceed 15 characters";
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
