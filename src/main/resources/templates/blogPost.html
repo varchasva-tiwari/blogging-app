@@ -98,6 +98,17 @@
 <a th:href="@{/readPosts}">Back to Blogs</a><br><br>
 <a th:href="@{/home}">Back to Home</a><br><br>
 
+<div class="loginLogout">
+    <div sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" id="logout" value="Logout">
+        </form>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a id="login" th:href="@{/login}">Login</a>
+    </div>
+</div>
+
 <form th:action="@{/updatePost}" th:object="${post}" method="post">
     <input type="hidden" th:value="${post.id}" name="id" >
     <input type="hidden" th:value="${post.excerpt}" name="excerpt">
@@ -137,11 +148,6 @@
             </p>
         </div>
 
-        <div class="postBtnsDiv" sec:authorize="isAnonymous()">
-            <input type="submit" class="editPostBtn" value="Edit Post">
-            <a class="deletePostLink" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
-        </div>
-
         <div class="postBtnsDiv" sec:authorize="hasRole('ROLE_admin')">
             <input type="submit" class="editPostBtn" value="Edit Post">
             <a class="deletePostLink" th:href="@{/deletePost(id=${post.id})}">Delete post</a>
@@ -155,6 +161,7 @@
 </form>
 
 <div class="commentsDiv">
+    <h3 class="title">Comments:</h3>
 <div th:each="oldComment : ${comments}">
     <form th:action="@{/updateComment}" th:object="${oldComment}" method="post">
         <div class="commentsDiv">
@@ -164,8 +171,6 @@
             <input type="hidden" th:value="${oldComment.email}" name="email">
             <input type="hidden" th:value="${oldComment.comment}" name="comment">
 
-            <h3 class="title">Comments:</h3>
-
             <b class="postContent">Name:</b><p th:text="${oldComment.name}"></p>
 
             <b class="postContent">Email:</b><p th:text="${oldComment.email}"></p>
@@ -173,13 +178,13 @@
             <b class="postContent">Comment:</b><p th:text="${oldComment.comment}"></p>
 
             <p>
-                <b class="commentHeading">Created:</b>
-                <span class="postContent" th:text="${#temporals.format(oldComment.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                <b class="postContent">Created:</b>
+                <span th:text="${#temporals.format(oldComment.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
             </p>
 
             <p>
-                <b class="commentHeading">Last Updated:</b>
-                <span class="postContent" th:text="${#temporals.format(oldComment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                <b class="postContent">Last Updated:</b>
+                <span th:text="${#temporals.format(oldComment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span>
             </p>
 
             <div sec:authorize="hasRole('ROLE_admin')">
@@ -190,7 +195,7 @@
             <div sec:authorize="hasRole('ROLE_author')">
                 <input type="submit" th:if="${#authentication.name == post.author}" value="Edit comment">
                 <a th:if="${#authentication.name == post.author}" th:href="@{/deleteComment(postId=${post.id},commentId=${oldComment.id})}">Delete comment</a>
-            </div><br><br>
+            </div>
         </div>
     </form>
 </div>

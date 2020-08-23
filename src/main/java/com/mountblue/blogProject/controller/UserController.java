@@ -15,14 +15,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/createUser")
-    public String createUser(Model model) {
+    @GetMapping("/register")
+    public String register(Model model) {
         model.addAttribute("newUser", new User());
         return "register";
     }
 
-    @PostMapping("/createUser")
-    public String createUser(@ModelAttribute("newUser") User user) {
+    @PostMapping("/register")
+    public String register(@ModelAttribute("newUser") User user) {
         userService.create(user);
         return "login";
     }

@@ -4,8 +4,21 @@
     <meta charset="UTF-8">
     <title th:text="'Home Page'"></title>
     <style>
+        body {
+            font-style: monospace;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 80px;
+            margin-top: 200px;
+        }
+
         a {
             color: black;
+            font-size: 50px;
+            text-decoration: none;
         }
 
         a:hover {
@@ -14,15 +27,16 @@
     </style>
 </head>
 <body>
-    <div sec:authorize="isAuthenticated()">
-        <a th:href="@{/showPostForm}">Create new blog post</a><br><br>
+    <div class="container">
+        <div sec:authorize="isAuthenticated()">
+            <a th:href="@{/showPostForm}">Post a blog</a>
+        </div>
+
+        <div sec:authorize="!isAuthenticated()">
+            <a th:href="@{/register}">Register</a>
+        </div><br>
+
+        <a th:href="@{/readPosts}">Read posts</a>
     </div>
-
-    <div sec:authorize="!isAuthenticated()">
-        <p>Register to start posting blogs:</p>
-        <a th:href="@{/register}">Register</a>
-    </div><br>
-
-    <a th:href="@{/readPosts}">See existing posts</a><br><br>
 </body>
 </html>

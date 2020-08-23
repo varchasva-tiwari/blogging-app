@@ -12,16 +12,14 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public int create(Post post) {
+    public void create(Post post) {
         post.setPublished(true);
         post.setPublishedAt(LocalDateTime.now());
 
@@ -30,8 +28,6 @@ public class PostService {
         post.setCreatedAt(createdAt);
         post.setUpdatedAt(LocalDateTime.now());
         postRepository.save(post);
-
-        return postRepository.getId(createdAt);
     }
 
     public Post readPost(int id) {
@@ -58,16 +54,6 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    public Page<Post> getPaginated(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return postRepository.findAll(pageable);
-    }
-
-    public List<Post> getSorted(String sortField, String sortOrder) {
-        Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
-        return postRepository.findAll(sort);
-    }
-
     public Page<Post> getPaginatedAndSorted(int pageNo, int pageSize, String sortField, String sortOrder) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
@@ -77,10 +63,14 @@ public class PostService {
     public Page<Post> getAllByKeyword(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
-        return postRepository.getPosts(word, pageable);
+        return postRepository.search(word, pageable);
     }
 
-    public List<Post> filter(String author, String dateTime, String tags) {
+    public boolean exists(Post post) {
+        return postRepository.existsById(post.getId());
+    }
+
+    public List<Post> searchAndFilter(String keyword, String author, String dateTime, String tags) {
         String publishedAt = "";
         List<String> tagNames = new ArrayList<>();
 
@@ -92,10 +82,6 @@ public class PostService {
             tagNames =  Arrays.asList(tags.split(", "));
         }
 
-        return postRepository.filter(author, publishedAt, tagNames);
-    }
-
-    public boolean exists(Post post) {
-        return postRepository.existsById(post.getId());
+        return postRepository.searchAndFilter(keyword, author, publishedAt, tagNames);
     }
 }

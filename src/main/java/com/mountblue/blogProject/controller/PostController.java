@@ -44,18 +44,18 @@ public class PostController {
     }
 
     @PostMapping ("/createPost")
-    private String createOrUpdate(@ModelAttribute("post") Post post, @ModelAttribute("newTags") String tags, Principal principal, Model model) {
+    private String createOrUpdate(@ModelAttribute("post") Post post,
+                                  @ModelAttribute("newTags") String tags,
+                                  Principal principal, Model model) {
             if(postService.exists(post)) {
                 post.setAuthor(principal.getName());
                 postService.update(post);
                 List<Integer> newTagIds = tagService.update(tags);
                 postTagService.create(post.getId(), newTagIds);
-            }
-
-            else {
+            } else {
                 post.setAuthor(principal.getName());
                 post.setUserId(userService.getId(principal.getName()));
-                int postId = postService.create(post);
+                postService.create(post);
 
                 List<Integer> newTagIds = tagService.update(tags);
                 postTagService.create(post.getId(), newTagIds);
@@ -86,11 +86,9 @@ public class PostController {
                              @RequestParam(value = "sortOrder", required = false) String sortOrder,
                                 Model model) {
 
-        List<Post> posts = new ArrayList<>();
-
         Page page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
 
-        posts = page.getContent();
+        List<Post> posts = page.getContent();
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
@@ -114,7 +112,6 @@ public class PostController {
                           @RequestParam(value = "sortField", required = false) String sortField,
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
                           Model model) {
-        System.out.println(pageNo+","+pageSize+","+sortField+","+sortOrder+","+keyword);
 
         Page page = postService.getAllByKeyword(pageNo, pageSize, sortField, sortOrder, keyword);
 
@@ -131,7 +128,6 @@ public class PostController {
         model.addAttribute("postTags", postTags);
         model.addAttribute("posts", posts);
         model.addAttribute("keyword", keyword);
-
 
         return "blogs";
     }
@@ -161,13 +157,14 @@ public class PostController {
     }
 
     @RequestMapping("/filter")
-    private String filter(@RequestParam(value = "author", required = false) String author,
+    private String filter(@RequestParam(value = "search", required = false) String keyword,
+                          @RequestParam(value = "author", required = false) String author,
                           @RequestParam(value = "dateTime", required = false) String dateTime,
                           @RequestParam(value = "tags", required = false) String tags,
                           Model model) {
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(postService.filter(author, dateTime, tags));
 
-        model.addAttribute("postTags", postTags);
+        LinkedHashMap<Post,List<Tag>> newPostTags = postTagService.getPostTags(postService.searchAndFilter(keyword, author, dateTime, tags));
+        model.addAttribute("postTags", newPostTags);
 
         return "blogs";
     }

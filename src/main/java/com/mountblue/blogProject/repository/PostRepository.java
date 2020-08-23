@@ -25,13 +25,22 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
             "OR p.id IN" +
             "(SELECT pt.postId FROM PostTag pt WHERE pt.tagId IN" +
             "(SELECT t.id FROM Tag t WHERE t.name LIKE %?1%))")
-    Page<Post> getPosts(String keyword, Pageable pageable);
+    Page<Post> search(String keyword, Pageable pageable);
 
-
-    @Query(value = "SELECT * FROM posts p WHERE ((:author = '') is true or p.author = :author) AND " +
-            "((:publishedAt = '') is true or to_char(p.published_at,'YYYY-MM-DD HH24:MI') = :publishedAt) AND" +
-            "((coalesce(:tagNames, null)) is null or p.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
-            "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames))))", nativeQuery = true)
-    List<Post> filter(@Param("author") String author, @Param("publishedAt") String publishedAt,
+    @Query(value = "SELECT * FROM " +
+            "(SELECT * FROM posts p " +
+            "WHERE (p.title LIKE %:keyword% " +
+            "OR  p.content LIKE %:keyword% " +
+            "OR  p.author LIKE %:keyword% " +
+            "OR p.excerpt LIKE %:keyword% " +
+            "OR p.id IN " +
+            "(SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
+            "(SELECT t.id FROM tags t WHERE t.name LIKE %:keyword%)))) AS post1 INNER JOIN " +
+            "(SELECT * FROM posts p2 WHERE ((:author = '') is true or p2.author = :author) AND " +
+            "((:publishedAt = '') is true or to_char(p2.published_at,'YYYY-MM-DD HH24:MI') = :publishedAt) AND" +
+            "((coalesce(:tagNames, null)) is null or p2.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
+            "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames))))) AS post2 " +
+            "ON post1.id = post2.id", nativeQuery = true)
+    List<Post> searchAndFilter(@Param("keyword") String keyword, @Param("author") String author, @Param("publishedAt") String publishedAt,
                       @Param("tagNames") List<String> tagNames);
 }

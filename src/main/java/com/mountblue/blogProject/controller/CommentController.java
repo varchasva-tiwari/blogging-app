@@ -38,6 +38,7 @@ public class CommentController {
         {
             if(principal != null) {
                 newComment.setUserId(userService.getId(principal.getName()));
+                newComment.setName(principal.getName());
             }
 
             commentService.create(newComment);

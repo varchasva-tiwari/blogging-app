@@ -86,6 +86,28 @@
             background-color: white;
             border: 2px solid gray;
         }
+         #logout:hover {
+            cursor: pointer;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            color: gray;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        #previous {
+            font-size: 35px;
+        }
+
+
+        #next {
+            font-size: 35px;
+        }
     </style>
 </head>
 <body>
@@ -94,18 +116,18 @@
 <div class="headerDiv">
     <form th:action="@{/searchPosts}" class="searchDiv">
         <div>
-            <input type="text" th:value="${search}" th:name="search" id="search" placeholder="Enter keywords"><br><br>
-            <input type="hidden" th:value="${currentPage}" th:name="start">
-            <input type="hidden" th:value="${pageSize}" th:name="limit">
-            <input type="hidden" th:value="publishedAt" th:name="sortField">
-            <input type="hidden" th:value="asc" th:name="sortOrder">
+            <input type="text" th:value="${search}" name="search" id="search" placeholder="Enter keywords"><br><br>
+            <input type="hidden" th:value="${currentPage}" name="start">
+            <input type="hidden" th:value="${pageSize}" name="limit">
+            <input type="hidden" th:value="publishedAt" name="sortField">
+            <input type="hidden" th:value="asc" name="sortOrder">
             <input type="submit" class="Btn" id="submitBtn" value="Search!">
         </div>
     </form><br>
 
     <div class="loginLogout">
         <div sec:authorize="isAuthenticated()">
-            <form th:action="@{/logout}">
+            <form th:action="@{/logout}" method="post">
                 <input type="submit" id="logout" value="Logout">
             </form>
         </div>
@@ -114,10 +136,12 @@
         </div>
     </div>
 </div>
+
 <div class="filterDiv">
     <h3>Filter Posts:</h3>
     <fieldset>
-        <form th:action="@{/filter(author=${author},dateTime=${dateTime},tags=${tags})}">
+        <form th:action="@{/filter}">
+            <input type="hidden" th:value="${keyword}" name="search">
             <input type="text" th:value="${author}" name="author" placeholder="By Author"><br><br>
             <input type="datetime-local" th:value="${dateTime}" name="dateTime"><br><br>
             <input type="text" th:value="${tags}" name="tags" placeholder="By Tags"><br><br>
@@ -125,6 +149,8 @@
         </form>
     </fieldset><br><br>
 </div>
+
+
 
 Sort posts by:
 <div th:if="${keyword!=null}">
@@ -139,7 +165,7 @@ Sort posts by:
 
 
 
-<a th:href="@{/readPosts}">Refresh</a><br><br>
+<a th:href="@{/readPosts}">Clear Filters</a><br><br>
 <div th:each="postTag : ${postTags}">
     <div class = "postDiv" th:with="post=${postTag.key}">
         <div class="titleDiv">
@@ -191,15 +217,17 @@ Sort posts by:
                     </span>
                     </p><br>
 
-                    <p>
-                        <a th:if="${currentPage - 1 > 0}" th:href="@{/readPosts(start=${currentPage - 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Previous</a>
-                        <span th:unless="${currentPage - 1 > 0}">Previous</span>
-                    </p>
+                    <div class="footer">
+                        <p>
+                            <a id="previous" th:if="${currentPage - 1 > 0}" th:href="@{/readPosts(start=${currentPage - 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Previous</a>
+                            <span id="previous" th:unless="${currentPage - 1 > 0}">Previous</span>
+                        </p>
 
-                    <p>
-                        <a th:if="${currentPage < totalPages}" th:href="@{/readPosts(start=${currentPage + 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Next</a>
-                        <span th:unless="${currentPage < totalPages}">Next</span>
-                    </p>
+                        <p>
+                            <a id="next" th:if="${currentPage < totalPages}" th:href="@{/readPosts(start=${currentPage + 1},limit=${pageSize},sortField=publishedAt,sortOrder=asc)}">Next</a>
+                            <span id="next" th:unless="${currentPage < totalPages}">Next</span>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
