@@ -2,12 +2,12 @@ package com.mountblue.blogProject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class BlogProjectApplication {
+public class BlogProjectApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BlogProjectApplication.class, args);
 	}
-
 }
