@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: comments; Type: TABLE; Schema: public; Owner: postgres
+-- Name: comments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.comments (
@@ -36,10 +36,8 @@ CREATE TABLE public.comments (
 );
 
 
-ALTER TABLE public.comments OWNER TO postgres;
-
 --
--- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.comments_id_seq
@@ -51,17 +49,15 @@ CREATE SEQUENCE public.comments_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.comments_id_seq OWNER TO postgres;
-
 --
--- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
 
 
 --
--- Name: hibernate_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: hibernate_sequence; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.hibernate_sequence
@@ -72,10 +68,8 @@ CREATE SEQUENCE public.hibernate_sequence
     CACHE 1;
 
 
-ALTER TABLE public.hibernate_sequence OWNER TO postgres;
-
 --
--- Name: post_tags; Type: TABLE; Schema: public; Owner: postgres
+-- Name: post_tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.post_tags (
@@ -86,10 +80,8 @@ CREATE TABLE public.post_tags (
 );
 
 
-ALTER TABLE public.post_tags OWNER TO postgres;
-
 --
--- Name: posts; Type: TABLE; Schema: public; Owner: postgres
+-- Name: posts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.posts (
@@ -106,10 +98,8 @@ CREATE TABLE public.posts (
 );
 
 
-ALTER TABLE public.posts OWNER TO postgres;
-
 --
--- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.posts_id_seq
@@ -121,17 +111,15 @@ CREATE SEQUENCE public.posts_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.posts_id_seq OWNER TO postgres;
-
 --
--- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: postgres
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.tags (
@@ -142,10 +130,8 @@ CREATE TABLE public.tags (
 );
 
 
-ALTER TABLE public.tags OWNER TO postgres;
-
 --
--- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.tags_id_seq
@@ -157,17 +143,15 @@ CREATE SEQUENCE public.tags_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tags_id_seq OWNER TO postgres;
-
 --
--- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -179,10 +163,8 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
-
 --
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.users_id_seq
@@ -194,45 +176,43 @@ CREATE SEQUENCE public.users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO postgres;
-
 --
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: comments id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: comments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq'::regclass);
 
 
 --
--- Name: posts id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
 
 
 --
--- Name: tags id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
 
 
 --
--- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
--- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.comments (id, name, email, comment, post_id, created_at, updated_at, user_id) FROM stdin;
@@ -246,7 +226,7 @@ COPY public.comments (id, name, email, comment, post_id, created_at, updated_at,
 
 
 --
--- Data for Name: post_tags; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: post_tags; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
@@ -285,7 +265,7 @@ COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.posts (id, title, excerpt, content, author, published_at, is_published, created_at, updated_at, user_id) FROM stdin;
@@ -305,7 +285,7 @@ COPY public.posts (id, title, excerpt, content, author, published_at, is_publish
 
 
 --
--- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.tags (id, name, created_at, updated_at) FROM stdin;
@@ -321,7 +301,7 @@ COPY public.tags (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.users (id, name, email, password, role) FROM stdin;
@@ -335,42 +315,42 @@ COPY public.users (id, name, email, password, role) FROM stdin;
 
 
 --
--- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.comments_id_seq', 31, true);
 
 
 --
--- Name: hibernate_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: hibernate_sequence; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.hibernate_sequence', 1, false);
 
 
 --
--- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.posts_id_seq', 45, true);
 
 
 --
--- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.tags_id_seq', 17, true);
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.users_id_seq', 9, true);
 
 
 --
--- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.comments
@@ -378,7 +358,7 @@ ALTER TABLE ONLY public.comments
 
 
 --
--- Name: post_tags post_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: post_tags post_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.post_tags
@@ -386,7 +366,7 @@ ALTER TABLE ONLY public.post_tags
 
 
 --
--- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.posts
@@ -394,7 +374,7 @@ ALTER TABLE ONLY public.posts
 
 
 --
--- Name: tags tags_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: tags tags_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -402,7 +382,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tags
@@ -410,7 +390,7 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -418,7 +398,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
