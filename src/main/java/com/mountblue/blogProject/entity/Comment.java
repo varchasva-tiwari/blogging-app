@@ -10,30 +10,18 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "comments")
 public class Comment {
-    private static final String NAME_EMPTY = "Name cannot be empty";
-    private static final String EMAIL_EMPTY = "Email cannot be empty";
-    private static final String EMAIL_WRONG_FORMAT = "Enter email in proper format";
-    private static final String COMMENT_EMPTY = "Comment cannot be empty";
-    private static final String COMMENT_EXCEEDED = "Comment cannot exceed 500 characters";
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "name")
-    @NotBlank(message = NAME_EMPTY)
-    @Size(max = 30)
     private String name;
 
     @Column(name = "email")
-    @NotBlank(message = EMAIL_EMPTY)
-    @Email(message = EMAIL_WRONG_FORMAT)
     private String email;
 
     @Column(name = "comment")
-    @NotBlank(message = COMMENT_EMPTY)
-    @Size(max = 500, message = COMMENT_EXCEEDED)
     private String comment;
 
     @Column(name = "post_id")

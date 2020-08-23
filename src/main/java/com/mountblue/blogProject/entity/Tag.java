@@ -9,17 +9,12 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tags")
 public class Tag {
-    private static final String NAME_EMPTY = "Tag name cannot be empty";
-    private static final String NAME_EXCEEDED = "Tag name cannot exceed 20 characters";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
     @Column(name = "name", nullable = false)
-    @NotBlank(message = NAME_EMPTY)
-    @Size(max = 20, message = NAME_EXCEEDED)
     private String name;
 
     @Column(name = "created_at")

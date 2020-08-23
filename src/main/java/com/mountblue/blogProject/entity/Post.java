@@ -12,38 +12,21 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "posts")
 public class Post {
-    private static final String TITLE_EMPTY = "Title cannot be empty";
-    private static final String EXCERPT_EMPTY = "Excerpt cannot be empty";
-    private static final String CONTENT_EMPTY = "Content cannot be empty";
-    private static final String AUTHOR_EMPTY = "Author Name cannot be empty";
-    private static final String TITLE_EXCEEDED = "Title cannot exceed 50 characters";
-    private static final String EXCERPT_EXCEEDED = "Excerpt cannot exceed 300 characters";
-    private static final String CONTENT_EXCEEDED = "Content cannot exceed 800 characters";
-    private static final String AUTHOR_EXCEEDED = "Author Name cannot exceed 30 characters";
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "title", nullable = false)
-    @NotBlank(message = TITLE_EMPTY)
-    @Size(max = 50, message = TITLE_EXCEEDED)
     private String title;
 
     @Column(name = "excerpt", nullable = false)
-    @NotBlank(message = EXCERPT_EMPTY)
-    @Size(max = 300, message = EXCERPT_EXCEEDED)
     private String excerpt;
 
     @Column(name = "content", nullable = false)
-    @NotBlank(message = CONTENT_EMPTY)
-    @Size(max = 800, message = CONTENT_EXCEEDED)
     private String content;
 
     @Column(name = "author", nullable = false)
-    @NotBlank(message = AUTHOR_EMPTY)
-    @Size(max = 30, message = AUTHOR_EXCEEDED)
     private String author;
 
     @Column(name = "published_at")
@@ -62,7 +45,6 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @Column(name = "user_id")
-    @NotNull
     private int userId;
 
     public Post() {}

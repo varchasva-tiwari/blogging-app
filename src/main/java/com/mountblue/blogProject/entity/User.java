@@ -22,23 +22,15 @@ public class User {
     private int id;
 
     @Column(name = "name", nullable = false)
-    @NotBlank(message = NAME_EMPTY)
-    @Size(max = 15, message = NAME_EXCEEDED)
     private String name;
 
     @Column(name = "email", unique = true, nullable = false)
-    @NotBlank(message = EMAIL_EMPTY)
-    @Email(message = EMAIL_WRONG_FORMAT)
-    @Size(max = 25, message = EMAIL_EXCEEDED)
     private String email;
 
     @Column(name = "password", nullable = false)
-    @NotBlank(message = PASSWORD_EMPTY)
-    @Size(max = 15, message = PASSWORD_EXCEEDED)
     private String password;
 
     @Column(name = "role", nullable = false)
-    @NotBlank(message = ROLE_EMPTY)
     private String role;
 
     public User() {}
