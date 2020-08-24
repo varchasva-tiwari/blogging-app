@@ -1,17 +1,11 @@
 package com.mountblue.blogProject.service;
 
 import com.mountblue.blogProject.entity.Post;
-import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.repository.PostRepository;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -19,7 +13,7 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public void create(Post post) {
+    public void savePost(Post post) {
         post.setPublished(true);
         post.setPublishedAt(LocalDateTime.now());
 
@@ -34,11 +28,7 @@ public class PostService {
         return postRepository.findById(id).get();
     }
 
-    public List<Post> readPosts() {
-       return postRepository.findAll();
-    }
-
-    public void update(Post post) {
+    public void editPost(Post post) {
         Post updatedPost = postRepository.getOne(post.getId());
 
         updatedPost.setTitle(post.getTitle());
@@ -50,7 +40,7 @@ public class PostService {
         postRepository.save(updatedPost);
     }
 
-    public void delete(int id) {
+    public void deletePost(int id) {
         postRepository.deleteById(id);
     }
 
@@ -60,13 +50,13 @@ public class PostService {
         return postRepository.findAll(pageable);
     }
 
-    public Page<Post> search(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
+    public Page<Post> searchPosts(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
         return postRepository.search(word, pageable);
     }
 
-    public Page<Post> filter(int pageNo, int pageSize, String author, String dateTime, String tags) {
+    public Page<Post> filterPosts(int pageNo, int pageSize, String author, String dateTime, String tags) {
         String publishedAt = "";
         List<String> tagNames = new ArrayList<>();
 
@@ -82,7 +72,7 @@ public class PostService {
         return postRepository.filter(author, publishedAt, tagNames, pageable);
     }
 
-    public Page<Post> searchAndFilter(int pageNo, int pageSize, String keyword, String author, String dateTime, String tags) {
+    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String dateTime, String tags) {
         String publishedAt = "";
         List<String> tagNames = new ArrayList<>();
 

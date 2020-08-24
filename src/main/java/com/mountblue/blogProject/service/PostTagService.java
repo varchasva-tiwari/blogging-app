@@ -7,7 +7,6 @@ import com.mountblue.blogProject.repository.PostTagRepository;
 import com.mountblue.blogProject.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class PostTagService {
     @Autowired
     private TagRepository tagRepository;
 
-    public void create(int postId, List<Integer> tagIds) {
+    public void savePostTag(int postId, List<Integer> tagIds) {
         tagIds.forEach(tagId -> {
             if(postTagRepository.containsTag(postId, tagId).isEmpty())
                 postTagRepository.savePostTag(postId, tagId);
@@ -39,7 +38,7 @@ public class PostTagService {
          return tags;
     }
 
-    public LinkedHashMap<Post, List<Tag>> getPostTags(List<Post> posts) {
+    public LinkedHashMap<Post, List<Tag>> readPostTags(List<Post> posts) {
         LinkedHashMap<Post,List<Tag>> postTags = new LinkedHashMap<>();
 
         posts.forEach(post -> {
@@ -49,7 +48,7 @@ public class PostTagService {
         return postTags;
     }
 
-    public void delete(int postId) {
+    public void deleteTag(int postId) {
         postTagRepository.deleteTag(postId);
     }
 }

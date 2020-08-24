@@ -4,11 +4,9 @@ import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.service.CommentService;
 import com.mountblue.blogProject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 
 @Controller
@@ -31,17 +29,17 @@ public class CommentController {
     @PostMapping("/createComment")
     public String saveComment(@ModelAttribute("newComment") Comment newComment, Principal principal) {
         if(commentService.exists(newComment)) {
-            commentService.update(newComment);
+            commentService.editComment(newComment);
         }
 
         else
         {
             if(principal != null) {
-                newComment.setUserId(userService.getId(principal.getName()));
+                newComment.setUserId(userService.getUserId(principal.getName()));
                 newComment.setName(principal.getName());
             }
 
-            commentService.create(newComment);
+            commentService.saveComment(newComment);
         }
 
         return "redirect:/readPost?id=" + newComment.getPostId();
@@ -55,7 +53,7 @@ public class CommentController {
 
     @RequestMapping("/deleteComment")
     public String deleteComment(@RequestParam("postId") int postId, @RequestParam("commentId") int commentId) {
-        commentService.delete(postId, commentId);
+        commentService.deleteComment(postId, commentId);
         return "redirect:/readPost?id=" + postId;
     }
 }

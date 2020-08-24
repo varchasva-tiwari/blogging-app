@@ -4,7 +4,6 @@ import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,17 +12,17 @@ public class CommentService {
     @Autowired
     CommentRepository commentRepository;
 
-    public void create(Comment comment) {
+    public void saveComment(Comment comment) {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
         commentRepository.save(comment);
     }
 
-    public List<Comment> read(int postId) {
+    public List<Comment> readComments(int postId) {
         return commentRepository.getComments(postId);
     }
 
-    public void update(Comment comment) {
+    public void editComment(Comment comment) {
         Comment updatedComment = commentRepository.getOne(comment.getId());
 
         updatedComment.setName(comment.getName());
@@ -39,7 +38,7 @@ public class CommentService {
             commentRepository.deleteById(postId);
     }
 
-    public void delete(int postId, int commentId) {
+    public void deleteComment(int postId, int commentId) {
         commentRepository.deleteComment(postId, commentId);
     }
 

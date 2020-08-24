@@ -19,11 +19,11 @@ public class TagService {
         tagRepository.saveAll(tags);
     }
 
-    public List<Tag> getTags() {
+    public List<Tag> readTags() {
         return tagRepository.findAll();
     }
 
-    public List<Integer> updateTags(String tags) {
+    public List<Integer> editTags(String tags) {
         List<String> tagNames = Arrays.asList(tags.split(", "));
 
         List<Integer> newTagIds = new ArrayList<>();

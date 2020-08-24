@@ -1,6 +1,5 @@
 package com.mountblue.blogProject.controller;
 
-import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.entity.Post;
 import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
@@ -9,12 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class PostController {
@@ -37,7 +33,7 @@ public class PostController {
     private String showForm(Model model) {
         String newTags = null;
         model.addAttribute("post", new Post());
-        model.addAttribute("oldTags", tagService.getTags());
+        model.addAttribute("oldTags", tagService.readTags());
         model.addAttribute("newTags", newTags);
 
         return "postForm";
@@ -49,17 +45,15 @@ public class PostController {
                                   Principal principal, Model model) {
             if(postService.exists(post)) {
                 post.setAuthor(principal.getName());
-                postService.update(post);
-                List<Integer> newTagIds = tagService.updateTags(tags);
-                postTagService.create(post.getId(), newTagIds);
+                postService.editPost(post);
             } else {
                 post.setAuthor(principal.getName());
-                post.setUserId(userService.getId(principal.getName()));
-                postService.create(post);
-
-                List<Integer> newTagIds = tagService.updateTags(tags);
-                postTagService.create(post.getId(), newTagIds);
+                post.setUserId(userService.getUserId(principal.getName()));
+                postService.savePost(post);
             }
+
+        List<Integer> newTagIds = tagService.editTags(tags);
+        postTagService.savePostTag(post.getId(), newTagIds);
 
         return "redirect:/readPost?id="+post.getId();
     }
@@ -68,8 +62,7 @@ public class PostController {
     private String readPost(@RequestParam("id")int postId, Model model) {
         model.addAttribute("post", postService.readPost(postId));
         model.addAttribute("tags", postTagService.readTags(postId));
-        model.addAttribute("comments", commentService.read(postId));
-        List<Comment> comments = commentService.read(postId);
+        model.addAttribute("comments", commentService.readComments(postId));
 
         return "blogPost";
     }
@@ -98,7 +91,7 @@ public class PostController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("keyword", null);
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
 
         model.addAttribute("postTags", postTags);
 
@@ -113,11 +106,11 @@ public class PostController {
                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
                           Model model) {
 
-        Page page = postService.search(pageNo, pageSize, sortField, sortOrder, keyword);
+        Page page = postService.searchPosts(pageNo, pageSize, sortField, sortOrder, keyword);
 
         List<Post> posts = page.getContent();
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
@@ -142,7 +135,7 @@ public class PostController {
         }
 
         model.addAttribute("post", post);
-        model.addAttribute("oldTags", tagService.getTags());
+        model.addAttribute("oldTags", tagService.readTags());
         model.addAttribute("newTags", newTagNames);
 
         return "postForm";
@@ -151,8 +144,8 @@ public class PostController {
     @RequestMapping("/deletePost")
     private String delete(@RequestParam("id") int postId) {
         commentService.deleteComments(postId);
-        postService.delete(postId);
-        postTagService.delete(postId);
+        postService.deletePost(postId);
+        postTagService.deleteTag(postId);
         return "redirect:/readPosts";
     }
 
@@ -168,14 +161,14 @@ public class PostController {
         Page page = null;
 
         if(keyword != null) {
-            page = postService.searchAndFilter(pageNo, pageSize, keyword, author, dateTime, tags);
+            page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, dateTime, tags);
         } else {
-            page = postService.filter(pageNo, pageSize, author, dateTime, tags);
+            page = postService.filterPosts(pageNo, pageSize, author, dateTime, tags);
         }
 
         List<Post> posts = page.getContent();
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
