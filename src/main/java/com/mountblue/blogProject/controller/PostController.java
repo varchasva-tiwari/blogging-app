@@ -1,18 +1,20 @@
 package com.mountblue.blogProject.controller;
 
+import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.entity.Post;
 import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
-@Controller
+@RestController
 public class PostController {
     @Autowired
     private PostService postService;
@@ -28,16 +30,6 @@ public class PostController {
 
     @Autowired
     private UserService userService;
-
-    @GetMapping("/showPostForm")
-    private String showForm(Model model) {
-        String newTags = null;
-        model.addAttribute("post", new Post());
-        model.addAttribute("oldTags", tagService.readTags());
-        model.addAttribute("newTags", newTags);
-
-        return "postForm";
-    }
 
     @PostMapping ("/createPost")
     private String createOrUpdate(@ModelAttribute("post") Post post,
@@ -58,21 +50,34 @@ public class PostController {
         return "redirect:/readPost?id="+post.getId();
     }
 
-    @RequestMapping("/readPost")
-    private String readPost(@RequestParam("id")int postId, Model model) {
-        model.addAttribute("post", postService.readPost(postId));
-        model.addAttribute("tags", postTagService.readTags(postId));
-        model.addAttribute("comments", commentService.readComments(postId));
+    @GetMapping("/posts/{id}")
+    private ResponseEntity<List<HashMap>> getPost(@PathVariable("id") int postId) {
+        if(postService.getPost(postId) == null) {
+            return new ResponseEntity<List<HashMap>>(HttpStatus.NOT_FOUND);
+        }
 
-        return "blogPost";
+        HashMap<String, Post> postHashMap = new HashMap<>();
+        HashMap<String, List<Tag>> tagHashMap = new HashMap<>();
+        HashMap<String, List<Comment>> commentHashMap = new HashMap<>();
+
+        postHashMap.put("post", postService.getPost(postId));
+        tagHashMap.put("tags", postTagService.readTags(postId));
+        commentHashMap.put("comments", commentService.readComments(postId));
+
+        List<HashMap> post = new ArrayList<>();
+        post.add(postHashMap);
+        post.add(tagHashMap);
+        post.add(commentHashMap);
+
+        return new ResponseEntity<List<HashMap>>(post, HttpStatus.OK);
     }
 
-    @RequestMapping("/readPosts")
-    private String readPosts(Model model) {
+    @GetMapping("/posts")
+    private String getPosts(Model model) {
         return getPaginatedPosts(1, 10,"publishedAt", "asc", model);
     }
 
-    @RequestMapping(value = "/readPosts", params = {"start", "limit", "sortField", "sortOrder"})
+    @RequestMapping(value = "/posts", params = {"start", "limit", "sortField", "sortOrder"})
     private String getPaginatedPosts(@RequestParam(value = "start", required = false) Integer pageNo,
                              @RequestParam(value = "limit", required = false) Integer pageSize,
                              @RequestParam(value = "sortField", required = false) String sortField,
@@ -135,7 +140,7 @@ public class PostController {
         }
 
         model.addAttribute("post", post);
-        model.addAttribute("oldTags", tagService.readTags());
+        model.addAttribute("oldTags", tagService.getTags());
         model.addAttribute("newTags", newTagNames);
 
         return "postForm";

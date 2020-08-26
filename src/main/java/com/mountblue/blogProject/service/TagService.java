@@ -19,7 +19,7 @@ public class TagService {
         tagRepository.saveAll(tags);
     }
 
-    public List<Tag> readTags() {
+    public List<Tag> getTags() {
         return tagRepository.findAll();
     }
 

@@ -18,6 +18,8 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
     @Query("SELECT p.id FROM Post p WHERE p.createdAt = :createdAt")
     public int getId(@Param("createdAt") LocalDateTime createdAt);
 
+    public Post findById(int id);
+
     @Query("SELECT p FROM Post p WHERE p.title LIKE %?1%" +
             "OR  p.content LIKE %?1%" +
             "OR  p.author LIKE %?1%" +

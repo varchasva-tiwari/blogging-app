@@ -24,12 +24,12 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public Post readPost(int id) {
-        return postRepository.findById(id).get();
+    public Post getPost(int id) {
+        return postRepository.findById(id);
     }
 
     public void editPost(Post post) {
-        Post updatedPost = postRepository.getOne(post.getId());
+        Post updatedPost = postRepository.findById(post.getId());
 
         updatedPost.setTitle(post.getTitle());
         updatedPost.setContent(post.getContent());
