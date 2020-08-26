@@ -1,10 +1,13 @@
 package com.mountblue.blogProject.controller;
 
+import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.entity.Post;
 import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,7 @@ import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-@Controller
+@RestController
 public class PostController {
     @Autowired
     private PostService postService;
@@ -29,18 +32,8 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/showPostForm")
-    private String showForm(Model model) {
-        String newTags = null;
-        model.addAttribute("post", new Post());
-        model.addAttribute("oldTags", tagService.readTags());
-        model.addAttribute("newTags", newTags);
-
-        return "postForm";
-    }
-
     @PostMapping ("/createPost")
-    private String createOrUpdate(@ModelAttribute("post") Post post,
+    private String saveOrUpdatePost(@ModelAttribute("post") Post post,
                                   @ModelAttribute("newTags") String tags,
                                   Principal principal, Model model) {
             if(postService.exists(post)) {
@@ -58,17 +51,17 @@ public class PostController {
         return "redirect:/readPost?id="+post.getId();
     }
 
-    @RequestMapping("/readPost")
-    private String readPost(@RequestParam("id")int postId, Model model) {
-        model.addAttribute("post", postService.readPost(postId));
-        model.addAttribute("tags", postTagService.readTags(postId));
-        model.addAttribute("comments", commentService.readComments(postId));
+    @GetMapping("/posts/{id}")
+    private ResponseEntity<Post> getPostById(@PathVariable("id")int postId) {
+        Post post = postService.getPost(postId);
+        List<Tag> tags = postTagService.getTags(postId);
+        List<Comment> comments = commentService.readComments(postId);
 
-        return "blogPost";
+        return new ResponseEntity<Post>(post, HttpStatus.OK);
     }
 
     @RequestMapping("/readPosts")
-    private String readPosts(Model model) {
+    private String getPosts(Model model) {
         return getPaginatedPosts(1, 10,"publishedAt", "asc", model);
     }
 
@@ -127,7 +120,7 @@ public class PostController {
 
     @RequestMapping("/updatePost")
     private String updateForm(@ModelAttribute("post") Post post, Model model) {
-        List<Tag> newTags = postTagService.readTags(post.getId());
+        List<Tag> newTags = postTagService.getTags(post.getId());
 
         String newTagNames = "";
         for(Tag tag: newTags) {
@@ -135,14 +128,14 @@ public class PostController {
         }
 
         model.addAttribute("post", post);
-        model.addAttribute("oldTags", tagService.readTags());
+        model.addAttribute("oldTags", tagService.getTags());
         model.addAttribute("newTags", newTagNames);
 
         return "postForm";
     }
 
     @RequestMapping("/deletePost")
-    private String delete(@RequestParam("id") int postId) {
+    private String deletePost(@RequestParam("id") int postId) {
         commentService.deleteComments(postId);
         postService.deletePost(postId);
         postTagService.deleteTag(postId);
@@ -150,7 +143,7 @@ public class PostController {
     }
 
     @RequestMapping("/filter")
-    private String filter(@RequestParam(value = "start", required = false) Integer pageNo,
+    private String filterPost(@RequestParam(value = "start", required = false) Integer pageNo,
                           @RequestParam(value = "limit", required = false) Integer pageSize,
                           @RequestParam(value = "search", required = false) String keyword,
                           @RequestParam(value = "author", required = false) String author,

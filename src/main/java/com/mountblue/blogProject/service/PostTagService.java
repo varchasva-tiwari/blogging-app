@@ -26,7 +26,7 @@ public class PostTagService {
         });
     }
 
-    public List<Tag> readTags(int postId) {
+    public List<Tag> getTags(int postId) {
          List<PostTag> postTags = postTagRepository.getTags(postId);
 
          List<Tag> tags = new ArrayList<>();
@@ -42,7 +42,7 @@ public class PostTagService {
         LinkedHashMap<Post,List<Tag>> postTags = new LinkedHashMap<>();
 
         posts.forEach(post -> {
-            postTags.put(post, readTags(post.getId()));
+            postTags.put(post, getTags(post.getId()));
         });
 
         return postTags;

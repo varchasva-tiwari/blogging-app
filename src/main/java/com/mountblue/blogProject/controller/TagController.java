@@ -12,9 +12,9 @@ public class TagController {
     private TagService tagService;
 
     @RequestMapping("/readTags")
-    private ModelAndView readTags() {
+    private ModelAndView getTags() {
         ModelAndView mv = new ModelAndView();
-        mv.addObject("tag", tagService.readTags());
+        mv.addObject("tag", tagService.getTags());
         return mv;
     }
 }
