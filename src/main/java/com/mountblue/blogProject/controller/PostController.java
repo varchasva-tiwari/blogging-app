@@ -85,34 +85,8 @@ public class PostController {
                              @RequestParam(value = "limit", required = false) Integer pageSize,
                              @RequestParam(value = "sortField", required = false) String sortField,
                              @RequestParam(value = "sortOrder", required = false) String sortOrder) {
-
         List<Post> posts = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
         List<List<Map>> postTags = postTagService.getPostTags(posts);
-
-        return new ResponseEntity<>(postTags, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/posts", params = {"keyword"})
-    private ResponseEntity<List<List<Map>>> searchPosts(@RequestParam("keyword") String keyword) {
-
-        List<Post> posts = postService.search(keyword);
-        List<List<Map>> postTags = postTagService.getPostTags(posts);
-
-        return new ResponseEntity<>(postTags, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/posts", params = {"keyword", "start", "limit", "sortField", "sortOrder"})
-    private ResponseEntity<List<List<Map>>> paginatedAndSortedSearch(@RequestParam("keyword") String keyword,
-                          @RequestParam(value = "start", required = false) Integer pageNo,
-                          @RequestParam(value = "limit", required = false) Integer pageSize,
-                          @RequestParam(value = "sortField", required = false) String sortField,
-                          @RequestParam(value = "sortOrder", required = false) String sortOrder) {
-
-        Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
-
-        List<Post> posts = page.getContent();
-        List<List<Map>> postTags = postTagService.getPostTags(posts);
-
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
@@ -155,38 +129,49 @@ public class PostController {
         return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
     }
 
-    /*@RequestMapping("/filter")
-    private String filter(@RequestParam(value = "start", required = false) Integer pageNo,
-                          @RequestParam(value = "limit", required = false) Integer pageSize,
-                          @RequestParam(value = "search", required = false) String keyword,
-                          @RequestParam(value = "author", required = false) String author,
-                          @RequestParam(value = "dateTime", required = false) String dateTime,
-                          @RequestParam(value = "tags", required = false) String tags,
-                          Model model) {
-
-        Page page = null;
-
-        if(keyword != null) {
-            page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, dateTime, tags);
-        } else {
-            page = postService.filterPosts(pageNo, pageSize, author, dateTime, tags);
-        }
+    @GetMapping(value = "/posts", params = "keyword")
+    private ResponseEntity<List<List<Map>>> paginatedAndSortedSearch(@RequestParam("keyword") String keyword,
+                                                                     @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                                                     @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                                                     @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+                                                                     @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+        System.out.println(keyword+","+pageNo+","+pageSize+","+sortField+","+sortOrder);
+        Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
 
         List<Post> posts = page.getContent();
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
+        if(posts.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("pageSize", pageSize);
-        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalPosts", page.getTotalElements());
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("author", author);
-        model.addAttribute("dateTime", dateTime);
-        model.addAttribute("tags", tags);
-        model.addAttribute("postTags", postTags);
+        List<List<Map>> postTags = postTagService.getPostTags(posts);
 
-        return "blogs";
-    }*/
+        return new ResponseEntity<>(postTags, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/posts", params = "filter")
+    private ResponseEntity<List<List<Map>>> filter(@RequestParam(value = "filter") boolean filter,
+                                                   @RequestParam(value = "author", defaultValue = "") String author,
+                                                   @RequestParam(value = "fromDate", defaultValue = "") String fromDate,
+                                                   @RequestParam(value = "toDate", defaultValue = "") String toDate,
+                                                   @RequestParam(value = "tags", defaultValue = "") String tags,
+                                                   @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                                   @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                                   @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+
+
+        System.out.println(filter+","+author+","+fromDate+","+toDate+","+pageSize);
+        Page page = null;
+
+        if(!keyword.equals("")) {
+            page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, fromDate, toDate, tags);
+        } else {
+            page = postService.filterPosts(pageNo, pageSize, author, fromDate, toDate, tags);
+        }
+
+        List<Post> posts = page.getContent();
+        List<List<Map>> postTags = postTagService.getPostTags(posts);
+
+        return new ResponseEntity<>(postTags, HttpStatus.OK);
+    }
 }

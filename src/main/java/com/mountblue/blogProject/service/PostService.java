@@ -60,46 +60,32 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> search(String keyword) {
-        return postRepository.search(keyword);
-    }
-
     public Page<Post> paginatedAndSortedSearch(String keyword, int pageNo, int pageSize, String sortField, String sortOrder) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
         return postRepository.paginatedAndSortedSearch(keyword, pageable);
     }
 
-    public Page<Post> filterPosts(int pageNo, int pageSize, String author, String dateTime, String tags) {
-        String publishedAt = "";
+    public Page<Post> filterPosts(int pageNo, int pageSize, String author, String fromDate, String toDate, String tags) {
         List<String> tagNames = new ArrayList<>();
-
-        if(!dateTime.equals("")) {
-            publishedAt = dateTime.replace('T', ' ');
-        }
 
         if(!tags.equals("")) {
             tagNames =  Arrays.asList(tags.split(", "));
         }
 
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return postRepository.filter(author, publishedAt, tagNames, pageable);
+        return postRepository.filter(author, fromDate, toDate, tagNames, pageable);
     }
 
-    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String dateTime, String tags) {
-        String publishedAt = "";
+    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String fromDate, String toDate, String tags) {
         List<String> tagNames = new ArrayList<>();
-
-        if(!dateTime.equals("")) {
-            publishedAt = dateTime.replace('T', ' ');
-        }
 
         if(!tags.equals("")) {
             tagNames =  Arrays.asList(tags.split(", "));
         }
 
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return postRepository.searchAndFilter(keyword, author, publishedAt, tagNames, pageable);
+        return postRepository.searchAndFilter(keyword, author, fromDate, toDate, tagNames, pageable);
     }
 
     public boolean exists(Post post) {

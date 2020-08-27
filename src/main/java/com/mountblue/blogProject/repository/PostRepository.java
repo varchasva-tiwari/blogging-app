@@ -27,26 +27,19 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
             "OR p.id IN" +
             "(SELECT pt.postId FROM PostTag pt WHERE pt.tagId IN" +
             "(SELECT t.id FROM Tag t WHERE t.name LIKE %?1%))")
-    List<Post> search(String keyword);
-
-    @Query("SELECT p FROM Post p WHERE p.title LIKE %?1%" +
-            "OR p.content LIKE %?1%" +
-            "OR p.author LIKE %?1%" +
-            "OR p.excerpt LIKE %?1%" +
-            "OR p.id IN" +
-            "(SELECT pt.postId FROM PostTag pt WHERE pt.tagId IN" +
-            "(SELECT t.id FROM Tag t WHERE t.name LIKE %?1%))")
     Page<Post> paginatedAndSortedSearch(String keyword, Pageable pageable);
 
 
     @Query(value = "SELECT * FROM (posts p WHERE ((:author = '') is true or p.author = :author) AND " +
-            "((:publishedAt = '') is true or to_char(p.published_at,'YYYY-MM-DD HH24:MI') = :publishedAt) AND" +
+            "((:fromDate = '' AND :toDate = '') is true OR (to_char(p.published_at,'YYYY-MM-DD') >= :fromDate " +
+            "AND (to_char(p.published_at,'YYYY-MM-DD') <= :toDate)) AND" +
             "((coalesce(:tagNames, null)) is null or p.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
             "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames))))) AS post",
             countQuery = "SELECT count(*) FROM post",
             nativeQuery = true)
-    Page<Post> filter(@Param("author") String author, @Param("publishedAt") String publishedAt,
-                      @Param("tagNames") List<String> tagNames, Pageable pageable);
+    Page<Post> filter(@Param("author") String author, @Param("fromDate") String fromDate,
+                      @Param("toDate") String toDate, @Param("tagNames") List<String> tagNames,
+                      Pageable pageable);
 
     @Query(value = "SELECT * FROM (" +
             "(SELECT * FROM posts p " +
@@ -58,12 +51,14 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
             "(SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
             "(SELECT t.id FROM tags t WHERE t.name LIKE %:keyword%)))) AS post1 INNER JOIN " +
             "(SELECT * FROM posts p2 WHERE ((:author = '') is true or p2.author = :author) AND " +
-            "((:publishedAt = '') is true or to_char(p2.published_at,'YYYY-MM-DD HH24:MI') = :publishedAt) AND" +
+            "(((:fromDate = '' AND :toDate = '') is true OR (to_char(p.published_at,'YYYY-MM-DD') >= :fromDate " +
+            "AND (to_char(p.published_at,'YYYY-MM-DD') <= :toDate)) AND" +
             "((coalesce(:tagNames, null)) is null or p2.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
             "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames))))) AS post2 " +
             "ON post1.id = post2.id) AS post3",
             countQuery = "SELECT count(*) FROM post3",
             nativeQuery = true)
-    Page<Post> searchAndFilter(@Param("keyword") String keyword, @Param("author") String author, @Param("publishedAt") String publishedAt,
-                      @Param("tagNames") List<String> tagNames, Pageable pageable);
+    Page<Post> searchAndFilter(@Param("keyword") String keyword, @Param("author") String author,
+                               @Param("fromDate") String fromDate, @Param("toDate") String toDate,
+                               @Param("tagNames") List<String> tagNames, Pageable pageable);
 }
