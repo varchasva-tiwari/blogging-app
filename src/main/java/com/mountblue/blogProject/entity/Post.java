@@ -4,6 +4,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "posts")
@@ -44,6 +46,13 @@ public class Post {
     private int userId;
 
     public Post() {}
+
+    public Post(Map postMap) {
+        this.setTitle((String) postMap.get("title"));
+        this.setAuthor((String) postMap.get("author"));
+        this.setExcerpt((String)postMap.get("excerpt"));
+        this.setContent((String) postMap.get("content"));
+    }
 
     public int getId() {
         return id;

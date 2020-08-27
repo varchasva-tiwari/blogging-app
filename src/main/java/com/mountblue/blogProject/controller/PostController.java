@@ -6,9 +6,10 @@ import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -31,130 +32,130 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    @PostMapping ("/createPost")
-    private String createOrUpdate(@ModelAttribute("post") Post post,
-                                  @ModelAttribute("newTags") String tags,
-                                  Principal principal, Model model) {
-            if(postService.exists(post)) {
-                post.setAuthor(principal.getName());
-                postService.editPost(post);
-            } else {
-                post.setAuthor(principal.getName());
-                post.setUserId(userService.getUserId(principal.getName()));
-                postService.savePost(post);
-            }
+    @PostMapping ("/posts")
+    private ResponseEntity<String> savePost(@RequestBody List<Map<String, ? extends Object>> postTags) {
+        Post post = null;
+        Map<String, Map> postMap = (Map<String, Map>) postTags.get(0);
+        Map<String, String> tagsMap = (Map<String, String>) postTags.get(1);
 
-        List<Integer> newTagIds = tagService.editTags(tags);
-        postTagService.savePostTag(post.getId(), newTagIds);
+        for(Map.Entry<String, Map> postMapEntry : postMap.entrySet()) {
+            post = postService.savePost(new Post(postMapEntry.getValue()));
+        }
 
-        return "redirect:/readPost?id="+post.getId();
+        for(Map.Entry<String, String> tagsMapEntry : tagsMap.entrySet()) {
+            List<Integer> newTagIds = tagService.editTags(tagsMapEntry.getValue());
+            postTagService.savePostTag(post.getId(), newTagIds);
+        }
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Location", "/posts/{"+post.getId()+"}");
+
+        return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.OK);
     }
 
     @GetMapping("/posts/{id}")
-    private ResponseEntity<List<HashMap>> getPost(@PathVariable("id") int postId) {
+    private ResponseEntity<? extends Object> getPost(@PathVariable("id") int postId) {
         if(postService.getPost(postId) == null) {
-            return new ResponseEntity<List<HashMap>>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<String>("This post has either been deleted or does not exist!", HttpStatus.NOT_FOUND);
         }
 
-        HashMap<String, Post> postHashMap = new HashMap<>();
-        HashMap<String, List<Tag>> tagHashMap = new HashMap<>();
-        HashMap<String, List<Comment>> commentHashMap = new HashMap<>();
+        Map<String, Post> postMap = new HashMap<>();
+        Map<String, List<Tag>> tagsMap = new HashMap<>();
+        Map<String, List<Comment>> commentsMap = new HashMap<>();
 
-        postHashMap.put("post", postService.getPost(postId));
-        tagHashMap.put("tags", postTagService.readTags(postId));
-        commentHashMap.put("comments", commentService.readComments(postId));
+        postMap.put("post", postService.getPost(postId));
+        tagsMap.put("tags", postTagService.getTags(postId));
+        commentsMap.put("comments", commentService.readComments(postId));
 
-        List<HashMap> post = new ArrayList<>();
-        post.add(postHashMap);
-        post.add(tagHashMap);
-        post.add(commentHashMap);
+        List<Map> post = new ArrayList<>();
+        post.add(postMap);
+        post.add(tagsMap);
+        post.add(commentsMap);
 
-        return new ResponseEntity<List<HashMap>>(post, HttpStatus.OK);
+        return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
     @GetMapping("/posts")
-    private String getPosts(Model model) {
-        return getPaginatedPosts(1, 10,"publishedAt", "asc", model);
+    private ResponseEntity<List<List<Map>>> getPosts() {
+        return getPaginatedPosts(1, 10,"publishedAt", "asc");
     }
 
-    @RequestMapping(value = "/posts", params = {"start", "limit", "sortField", "sortOrder"})
-    private String getPaginatedPosts(@RequestParam(value = "start", required = false) Integer pageNo,
+    @GetMapping(value = "/posts", params = {"start", "limit", "sortField", "sortOrder"})
+    private ResponseEntity<List<List<Map>>> getPaginatedPosts(@RequestParam(value = "start", required = false) Integer pageNo,
                              @RequestParam(value = "limit", required = false) Integer pageSize,
                              @RequestParam(value = "sortField", required = false) String sortField,
-                             @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                                Model model) {
+                             @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
-        Page page = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
+        List<Post> posts = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
+        List<List<Map>> postTags = postTagService.getPostTags(posts);
 
-        List<Post> posts = page.getContent();
-
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("pageSize", pageSize);
-        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalPosts", page.getTotalElements());
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("keyword", null);
-
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
-
-        model.addAttribute("postTags", postTags);
-
-        return "blogs";
+        return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/searchPosts")
-    private String getPaginatedSearch(@RequestParam("search") String keyword,
+    @GetMapping(value = "/posts", params = {"keyword"})
+    private ResponseEntity<List<List<Map>>> searchPosts(@RequestParam("keyword") String keyword) {
+
+        List<Post> posts = postService.search(keyword);
+        List<List<Map>> postTags = postTagService.getPostTags(posts);
+
+        return new ResponseEntity<>(postTags, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/posts", params = {"keyword", "start", "limit", "sortField", "sortOrder"})
+    private ResponseEntity<List<List<Map>>> paginatedAndSortedSearch(@RequestParam("keyword") String keyword,
                           @RequestParam(value = "start", required = false) Integer pageNo,
                           @RequestParam(value = "limit", required = false) Integer pageSize,
                           @RequestParam(value = "sortField", required = false) String sortField,
-                          @RequestParam(value = "sortOrder", required = false) String sortOrder,
-                          Model model) {
+                          @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
-        Page page = postService.searchPosts(pageNo, pageSize, sortField, sortOrder, keyword);
+        Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
 
         List<Post> posts = page.getContent();
+        List<List<Map>> postTags = postTagService.getPostTags(posts);
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
-
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("pageSize", pageSize);
-        model.addAttribute("currentTotalPosts", page.getNumberOfElements());
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalPosts", page.getTotalElements());
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("postTags", postTags);
-        model.addAttribute("posts", posts);
-        model.addAttribute("keyword", keyword);
-
-        return "blogs";
+        return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
-    @RequestMapping("/updatePost")
-    private String updateForm(@ModelAttribute("post") Post post, Model model) {
-        List<Tag> newTags = postTagService.readTags(post.getId());
+    @PatchMapping("/posts/{id}")
+    private ResponseEntity<String> editPost(@PathVariable("id") int postId, @RequestBody List<Map<String, ? extends Object>> editedPost) {
+        Post updatedPost = null;
 
-        String newTagNames = "";
-        for(Tag tag: newTags) {
-            newTagNames = newTagNames + tag.getName() + ", ";
+        Map<String, Map> postMap = (Map<String, Map>) editedPost.get(0);
+
+        for(Map.Entry<String, Map> postEntry : postMap.entrySet()) {
+            updatedPost = postService.editPost(new Post(postEntry.getValue()));
+
+            if(updatedPost == null) {
+                return new ResponseEntity<>("Could find post with given id!", HttpStatus.NOT_FOUND);
+            }
         }
 
-        model.addAttribute("post", post);
-        model.addAttribute("oldTags", tagService.getTags());
-        model.addAttribute("newTags", newTagNames);
+        if(editedPost.size() == 2) {
+            Map<String, String> tagsMap = (Map<String, String>) editedPost.get(1);
 
-        return "postForm";
+            for(Map.Entry<String, String> tagsEntry : tagsMap.entrySet()) {
+                List<Integer> newTagIds = tagService.editTags(tagsEntry.getValue());
+                postTagService.savePostTag(postId, newTagIds);
+            }
+        }
+
+        return new ResponseEntity<String>("Post updated successfully!", HttpStatus.OK);
     }
 
-    @RequestMapping("/deletePost")
-    private String delete(@RequestParam("id") int postId) {
+    @DeleteMapping(value = "/posts/{id}")
+    private ResponseEntity<String> delete(@PathVariable("id") int postId) {
+        if(!postService.existsById(postId)) {
+            return new ResponseEntity<>("Incorrect id!", HttpStatus.NOT_FOUND);
+        }
+
         commentService.deleteComments(postId);
         postService.deletePost(postId);
         postTagService.deleteTag(postId);
-        return "redirect:/readPosts";
+
+        return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
     }
 
-    @RequestMapping("/filter")
+    /*@RequestMapping("/filter")
     private String filter(@RequestParam(value = "start", required = false) Integer pageNo,
                           @RequestParam(value = "limit", required = false) Integer pageSize,
                           @RequestParam(value = "search", required = false) String keyword,
@@ -173,7 +174,7 @@ public class PostController {
 
         List<Post> posts = page.getContent();
 
-        LinkedHashMap<Post,List<Tag>> postTags = postTagService.readPostTags(posts);
+        LinkedHashMap<Post,List<Tag>> postTags = postTagService.getPostTags(posts);
 
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("pageSize", pageSize);
@@ -187,5 +188,5 @@ public class PostController {
         model.addAttribute("postTags", postTags);
 
         return "blogs";
-    }
+    }*/
 }

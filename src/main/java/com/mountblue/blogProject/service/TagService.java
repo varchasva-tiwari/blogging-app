@@ -35,9 +35,10 @@ public class TagService {
                 tag = new Tag();
                 tag.setName(name);
                 tag.setCreatedAt(LocalDateTime.now());
-
+                tag.setUpdatedAt(LocalDateTime.now());
                 tagRepository.save(tag);
             }
+
             newTagIds.add(tagRepository.getId(name));
         });
 

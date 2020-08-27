@@ -21,13 +21,22 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
     public Post findById(int id);
 
     @Query("SELECT p FROM Post p WHERE p.title LIKE %?1%" +
-            "OR  p.content LIKE %?1%" +
-            "OR  p.author LIKE %?1%" +
+            "OR p.content LIKE %?1%" +
+            "OR p.author LIKE %?1%" +
             "OR p.excerpt LIKE %?1%" +
             "OR p.id IN" +
             "(SELECT pt.postId FROM PostTag pt WHERE pt.tagId IN" +
             "(SELECT t.id FROM Tag t WHERE t.name LIKE %?1%))")
-    Page<Post> search(String keyword, Pageable pageable);
+    List<Post> search(String keyword);
+
+    @Query("SELECT p FROM Post p WHERE p.title LIKE %?1%" +
+            "OR p.content LIKE %?1%" +
+            "OR p.author LIKE %?1%" +
+            "OR p.excerpt LIKE %?1%" +
+            "OR p.id IN" +
+            "(SELECT pt.postId FROM PostTag pt WHERE pt.tagId IN" +
+            "(SELECT t.id FROM Tag t WHERE t.name LIKE %?1%))")
+    Page<Post> paginatedAndSortedSearch(String keyword, Pageable pageable);
 
 
     @Query(value = "SELECT * FROM (posts p WHERE ((:author = '') is true or p.author = :author) AND " +

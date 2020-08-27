@@ -7,12 +7,17 @@ import com.mountblue.blogProject.repository.PostTagRepository;
 import com.mountblue.blogProject.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+
+import java.util.*;
 
 @Service
 public class PostTagService {
+    @Autowired
+    private PostService postService;
+
+    @Autowired
+    private PostTagService postTagService;
+
     @Autowired
     private PostTagRepository postTagRepository;
 
@@ -26,9 +31,8 @@ public class PostTagService {
         });
     }
 
-    public List<Tag> readTags(int postId) {
+    public List<Tag> getTags(int postId) {
          List<PostTag> postTags = postTagRepository.getTags(postId);
-
          List<Tag> tags = new ArrayList<>();
 
          postTags.forEach((postTag) -> {
@@ -38,12 +42,22 @@ public class PostTagService {
          return tags;
     }
 
-    public LinkedHashMap<Post, List<Tag>> readPostTags(List<Post> posts) {
-        LinkedHashMap<Post,List<Tag>> postTags = new LinkedHashMap<>();
+    public List<List<Map>> getPostTags(List<Post> posts) {
+        List<List<Map>> postTags = new ArrayList<>();
 
-        posts.forEach(post -> {
-            postTags.put(post, readTags(post.getId()));
-        });
+        for(Post post: posts) {
+            Map<String, Post> postMap = new HashMap<>();
+            Map<String, List<Tag>> tagsMap = new HashMap<>();
+
+            postMap.put("post", postService.getPost(post.getId()));
+            tagsMap.put("tags", postTagService.getTags(post.getId()));
+
+            List<Map> postTag = new ArrayList<>();
+            postTag.add(postMap);
+            postTag.add(tagsMap);
+
+            postTags.add(postTag);
+        }
 
         return postTags;
     }

@@ -13,7 +13,8 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public void savePost(Post post) {
+    public Post savePost(Post post) {
+        System.out.println("title: "+ post.getTitle());
         post.setPublished(true);
         post.setPublishedAt(LocalDateTime.now());
 
@@ -21,15 +22,19 @@ public class PostService {
 
         post.setCreatedAt(createdAt);
         post.setUpdatedAt(LocalDateTime.now());
-        postRepository.save(post);
+        return postRepository.save(post);
     }
 
     public Post getPost(int id) {
         return postRepository.findById(id);
     }
 
-    public void editPost(Post post) {
+    public Post editPost(Post post) {
         Post updatedPost = postRepository.findById(post.getId());
+
+        if(updatedPost == null) {
+            return null;
+        }
 
         updatedPost.setTitle(post.getTitle());
         updatedPost.setContent(post.getContent());
@@ -37,23 +42,32 @@ public class PostService {
         updatedPost.setAuthor(post.getAuthor());
         updatedPost.setUpdatedAt(LocalDateTime.now());
 
-        postRepository.save(updatedPost);
+        return postRepository.save(updatedPost);
     }
 
     public void deletePost(int id) {
         postRepository.deleteById(id);
     }
 
-    public Page<Post> getPaginatedAndSorted(int pageNo, int pageSize, String sortField, String sortOrder) {
+    public List<Post> getPaginatedAndSorted(int pageNo, int pageSize, String sortField, String sortOrder) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
-        return postRepository.findAll(pageable);
+
+        Page page = postRepository.findAll(pageable);
+
+        List<Post> posts = page.getContent();
+
+        return posts;
     }
 
-    public Page<Post> searchPosts(int pageNo, int pageSize, String sortField, String sortOrder, String word) {
+    public List<Post> search(String keyword) {
+        return postRepository.search(keyword);
+    }
+
+    public Page<Post> paginatedAndSortedSearch(String keyword, int pageNo, int pageSize, String sortField, String sortOrder) {
         Sort sort = sortOrder.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNo-1, pageSize, sort);
-        return postRepository.search(word, pageable);
+        return postRepository.paginatedAndSortedSearch(keyword, pageable);
     }
 
     public Page<Post> filterPosts(int pageNo, int pageSize, String author, String dateTime, String tags) {
@@ -90,6 +104,10 @@ public class PostService {
 
     public boolean exists(Post post) {
         return postRepository.existsById(post.getId());
+    }
+
+    public boolean existsById(int postId) {
+        return postRepository.existsById(postId);
     }
 
 }
