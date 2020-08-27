@@ -66,7 +66,7 @@ public class PostService {
         return postRepository.paginatedAndSortedSearch(keyword, pageable);
     }
 
-    public Page<Post> filterPosts(int pageNo, int pageSize, String author, String fromDate, String toDate, String tags) {
+    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String date, String tags) {
         List<String> tagNames = new ArrayList<>();
 
         if(!tags.equals("")) {
@@ -74,18 +74,7 @@ public class PostService {
         }
 
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return postRepository.filter(author, fromDate, toDate, tagNames, pageable);
-    }
-
-    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String fromDate, String toDate, String tags) {
-        List<String> tagNames = new ArrayList<>();
-
-        if(!tags.equals("")) {
-            tagNames =  Arrays.asList(tags.split(", "));
-        }
-
-        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return postRepository.searchAndFilter(keyword, author, fromDate, toDate, tagNames, pageable);
+        return postRepository.searchAndFilter(keyword, author, date, tagNames, pageable);
     }
 
     public boolean exists(Post post) {

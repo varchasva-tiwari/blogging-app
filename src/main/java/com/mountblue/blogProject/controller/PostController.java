@@ -151,25 +151,24 @@ public class PostController {
 
     @GetMapping(value = "/posts", params = "filter")
     private ResponseEntity<List<List<Map>>> filter(@RequestParam(value = "filter") boolean filter,
+                                                   @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                                    @RequestParam(value = "author", defaultValue = "") String author,
-                                                   @RequestParam(value = "fromDate", defaultValue = "") String fromDate,
-                                                   @RequestParam(value = "toDate", defaultValue = "") String toDate,
+                                                   @RequestParam(value = "date", defaultValue = "") String date,
                                                    @RequestParam(value = "tags", defaultValue = "") String tags,
                                                    @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                                                   @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
-                                                   @RequestParam(value = "keyword", defaultValue = "") String keyword) {
-
-
-        System.out.println(filter+","+author+","+fromDate+","+toDate+","+pageSize);
+                                                   @RequestParam(value = "limit", defaultValue = "10") Integer pageSize) {
         Page page = null;
 
-        if(!keyword.equals("")) {
-            page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, fromDate, toDate, tags);
-        } else {
-            page = postService.filterPosts(pageNo, pageSize, author, fromDate, toDate, tags);
-        }
+        page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, date, tags);
 
         List<Post> posts = page.getContent();
+
+        if(posts.size() == 0) {
+            HttpHeaders header = new HttpHeaders();
+            header.add("error", "Invalid filters!");
+            return new ResponseEntity<>(header, HttpStatus.NOT_FOUND);
+        }
+
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 
         return new ResponseEntity<>(postTags, HttpStatus.OK);
