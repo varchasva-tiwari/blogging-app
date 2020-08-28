@@ -5,24 +5,25 @@ import com.mountblue.blogProject.entity.User;
 import com.mountblue.blogProject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByName(username);
 
-        if(user.get() == null)
-            throw new UsernameNotFoundException("Username not found");
+        if(user == null)
+            throw new UsernameNotFoundException("Incorrect credentials");
 
-        return new MyUserDetails(user.get());
+        return new MyUserDetails(user);
     }
 
     public int getUserId(String name) {

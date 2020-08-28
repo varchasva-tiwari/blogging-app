@@ -8,6 +8,7 @@ import com.mountblue.blogProject.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,7 +28,7 @@ public class PostTagService {
     public void savePostTag(int postId, List<Integer> tagIds) {
         tagIds.forEach(tagId -> {
             if(postTagRepository.containsTag(postId, tagId).isEmpty())
-                postTagRepository.savePostTag(postId, tagId);
+                postTagRepository.savePostTag(postId, tagId, LocalDateTime.now(), LocalDateTime.now());
         });
     }
 

@@ -8,14 +8,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface PostTagRepository extends JpaRepository<PostTag,Integer> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT into post_tags (post_id, tag_id) VALUES(:postId, :tagId)", nativeQuery = true)
-    public void savePostTag(@Param("postId") int postId, @Param("tagId") int tagId);
+    @Query(value = "INSERT into post_tags (post_id, tag_id, created_at, updated_at) VALUES(:postId, :tagId, :createdAt, :updatedAt)", nativeQuery = true)
+    public void savePostTag(@Param("postId") int postId, @Param("tagId") int tagId,
+                            @Param("createdAt") LocalDateTime createdAt,
+                            @Param("updatedAt") LocalDateTime updatedAt);
 
     @Query("SELECT pt FROM PostTag pt WHERE pt.postId  = :postId")
     List<PostTag> getTags(@Param("postId") int postId);

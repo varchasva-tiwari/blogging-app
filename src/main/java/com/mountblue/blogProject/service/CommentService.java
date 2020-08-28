@@ -12,30 +12,39 @@ public class CommentService {
     @Autowired
     CommentRepository commentRepository;
 
-    public void saveComment(Comment comment) {
+    public Comment saveComment(Comment comment) {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
-        commentRepository.save(comment);
+        return commentRepository.save(comment);
     }
 
-    public List<Comment> readComments(int postId) {
+    public Comment getComment(int postId, int commentId) {
+        return commentRepository.getComment(postId, commentId);
+    }
+
+    public List<Comment> getComments(int postId) {
         return commentRepository.getComments(postId);
     }
 
-    public void editComment(Comment comment) {
-        Comment updatedComment = commentRepository.getOne(comment.getId());
+    public Comment editComment(Comment comment) {
+        Comment updatedComment = commentRepository.findById(comment.getId());
+
+        if(updatedComment == null) {
+            return null;
+        }
 
         updatedComment.setName(comment.getName());
         updatedComment.setEmail(comment.getEmail());
         updatedComment.setComment(comment.getComment());
         updatedComment.setUpdatedAt(LocalDateTime.now());
 
-        commentRepository.save(updatedComment);
+        return commentRepository.save(updatedComment);
     }
 
     public void deleteComments(int postId) {
-        if(commentRepository.getComments(postId).size() > 0)
+        if(commentRepository.getComments(postId).size() > 0) {
             commentRepository.deleteById(postId);
+        }
     }
 
     public void deleteComment(int postId, int commentId) {
@@ -44,5 +53,13 @@ public class CommentService {
 
     public boolean exists(Comment comment) {
         return commentRepository.existsById(comment.getId());
+    }
+
+    public boolean existsById(int commentId) {
+        return commentRepository.existsById(commentId);
+    }
+
+    public int getPostId(int commentId) {
+        return commentRepository.getPostId(commentId);
     }
 }

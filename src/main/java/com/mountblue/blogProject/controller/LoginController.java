@@ -1,12 +1,44 @@
 package com.mountblue.blogProject.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.mountblue.blogProject.entity.AuthenticationRequest;
+import com.mountblue.blogProject.entity.AuthenticationResponse;
+import com.mountblue.blogProject.service.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class LoginController {
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/authenticate")
+    private ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
+                    (authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect username or password!", e);
+        }
+
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+
+        final String jwt = jwtService.generateToken(userDetails);
+
+        return new ResponseEntity<>(new AuthenticationResponse(jwt), HttpStatus.OK);
     }
 }

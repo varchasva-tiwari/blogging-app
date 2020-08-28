@@ -85,4 +85,7 @@ public class PostService {
         return postRepository.existsById(postId);
     }
 
+    public String getAuthor(int postId) {
+        return postRepository.getAuthorById(postId);
+    }
 }

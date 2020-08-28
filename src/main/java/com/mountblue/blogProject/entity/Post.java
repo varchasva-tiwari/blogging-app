@@ -106,10 +106,6 @@ public class Post {
         return isPublished;
     }
 
-    public Boolean getIsPublished() {
-        return isPublished;
-    }
-
     public void setPublished(Boolean published) {
         isPublished = published;
     }
