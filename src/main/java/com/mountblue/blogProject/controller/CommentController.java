@@ -29,13 +29,17 @@ public class CommentController {
                                               @RequestBody Map<String, Comment> commentMap,
                                               Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<String>("Incorrect post id!",
+            return new ResponseEntity<String>("Post does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
         Comment comment = null;
         for(Map.Entry<String, Comment> commentEntry : commentMap.entrySet()) {
             comment = commentEntry.getValue();
+        }
+
+        if(comment.getName() == null || comment.getEmail() == null || comment.getComment() == null) {
+            return new ResponseEntity<>("Name/Email/Comment cannot be null!", HttpStatus.BAD_REQUEST);
         }
 
         comment.setPostId(postId);
@@ -45,26 +49,26 @@ public class CommentController {
         }
 
         if(commentService.saveComment(comment) == null) {
-            return new ResponseEntity<>("The comment could not be saved due to server issues! Please try again later!",
+            return new ResponseEntity<>("Comment could not be saved due to server issues! Please try again later!",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         HttpHeaders header = new HttpHeaders();
-        header.add("link", "/posts/" + postId + "/comments/" + comment.getId());
+        header.add("Location", "/posts/" + postId + "/comments/" + comment.getId());
 
-        return new ResponseEntity<>("Comment saved successfully!", header, HttpStatus.OK);
+        return new ResponseEntity<>("Comment saved successfully!", header, HttpStatus.CREATED);
     }
 
     @GetMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<?> getComment(@PathVariable("postId") int postId,
-                                                       @PathVariable("commentId") int commentId) {
+                                        @PathVariable("commentId") int commentId) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!",
+            return new ResponseEntity<>("Post does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
         if(!commentService.existsById(commentId)) {
-            return new ResponseEntity<>("Incorrect comment id!",
+            return new ResponseEntity<>("Comment does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
@@ -84,7 +88,7 @@ public class CommentController {
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<?> getComments(@PathVariable("postId") int postId) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!",
+            return new ResponseEntity<>("Post does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
@@ -100,11 +104,11 @@ public class CommentController {
                                               @RequestBody Map<String, Comment> commentMap,
                                               Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Post does not exist or has been deleted!", HttpStatus.NOT_FOUND);
         }
 
         if(!commentService.existsById(commentId)) {
-            return new ResponseEntity<>("Incorrect comment id!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Comment does not exist or has been deleted!", HttpStatus.NOT_FOUND);
         }
 
         if(commentService.getPostId(commentId) != postId) {
@@ -123,16 +127,21 @@ public class CommentController {
                     comment = commentEntry.getValue();
                 }
 
+                if(comment.getComment() == null) {
+                    return new ResponseEntity<>("Comment field cannot be null!", HttpStatus.BAD_REQUEST);
+                }
+
                 comment.setId(commentId);
                 comment.setPostId(postId);
 
                 Comment updatedComment = commentService.editComment(comment);
+
                 if (updatedComment == null) {
                     return new ResponseEntity<String>("The comment could not be saved due to server issues! Please try again later!",
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
-                return new ResponseEntity<String>("You are not authorized to perform this action!",
+                return new ResponseEntity<String>("Only the author can perform this action!",
                         HttpStatus.UNAUTHORIZED);
             }
         }
@@ -145,11 +154,11 @@ public class CommentController {
                                                 @PathVariable("commentId") int commentId,
                                                 Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Post does not exist!", HttpStatus.NOT_FOUND);
         }
 
         if(!commentService.existsById(commentId)) {
-            return new ResponseEntity<>("Incorrect comment id!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Comment does not exist!", HttpStatus.NOT_FOUND);
         }
 
         if(commentService.getPostId(commentId) != postId) {
@@ -164,7 +173,7 @@ public class CommentController {
             if (isPermitted(principal, postId)) {
                 commentService.deleteComment(postId, commentId);
             } else {
-                return new ResponseEntity<>("You are not authorized to perform this action!",
+                return new ResponseEntity<>("Only the author can perform this action!",
                         HttpStatus.UNAUTHORIZED);
             }
         }

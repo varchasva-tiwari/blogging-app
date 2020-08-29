@@ -6,9 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +39,7 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
             "(SELECT * FROM posts p2 WHERE ((:author = '') is true or p2.author = :author) AND " +
             "((:publishedAt = '') is true or to_char(p2.published_at,'YYYY-MM-DD') = :publishedAt) AND" +
             "((coalesce(:tagNames, null)) is null or p2.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
-            "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames))))ORDER BY p2.published_at --#pageable\n) AS post2 " +
+            "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames)))) ORDER BY p2.published_at --#pageable\n) AS post2 " +
             "ON post1.id = post2.id) AS post3",
             countQuery = "SELECT count(*) FROM post3",
             nativeQuery = true)

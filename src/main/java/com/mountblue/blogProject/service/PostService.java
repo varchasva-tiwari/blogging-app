@@ -14,7 +14,6 @@ public class PostService {
     private PostRepository postRepository;
 
     public Post savePost(Post post) {
-        System.out.println("title: "+ post.getTitle());
         post.setPublished(true);
         post.setPublishedAt(LocalDateTime.now());
 
@@ -22,6 +21,7 @@ public class PostService {
 
         post.setCreatedAt(createdAt);
         post.setUpdatedAt(LocalDateTime.now());
+
         return postRepository.save(post);
     }
 
@@ -32,13 +32,23 @@ public class PostService {
     public Post editPost(Post post) {
         Post updatedPost = postRepository.findById(post.getId());
 
-        if(updatedPost == null) {
-            return null;
+        if(post.getTitle() != null) {
+            updatedPost.setTitle(post.getTitle());
         }
 
-        updatedPost.setTitle(post.getTitle());
-        updatedPost.setContent(post.getContent());
-        updatedPost.setExcerpt(post.getExcerpt());
+        if(post.getAuthor() != null) {
+            updatedPost.setAuthor(post.getAuthor());
+        }
+
+
+        if(post.getExcerpt() != null) {
+            updatedPost.setExcerpt(post.getExcerpt());
+        }
+
+        if(post.getContent() != null) {
+            updatedPost.setContent(post.getContent());
+        }
+
         updatedPost.setAuthor(post.getAuthor());
         updatedPost.setUpdatedAt(LocalDateTime.now());
 

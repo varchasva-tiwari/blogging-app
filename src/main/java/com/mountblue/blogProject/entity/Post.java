@@ -48,10 +48,21 @@ public class Post {
     public Post() {}
 
     public Post(Map postMap) {
-        this.setTitle((String) postMap.get("title"));
-        this.setAuthor((String) postMap.get("author"));
-        this.setExcerpt((String)postMap.get("excerpt"));
-        this.setContent((String) postMap.get("content"));
+        if((String)postMap.get("title") != null) {
+            this.setTitle((String) postMap.get("title"));
+        }
+
+        if((String)postMap.get("author") != null) {
+            this.setAuthor((String) postMap.get("author"));
+        }
+
+        if((String)postMap.get("excerpt") != null) {
+            this.setExcerpt((String)postMap.get("excerpt"));
+        }
+
+        if((String)postMap.get("content") != null) {
+            this.setContent((String) postMap.get("content"));
+        }
     }
 
     public int getId() {

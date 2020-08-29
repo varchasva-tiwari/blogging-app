@@ -30,8 +30,20 @@ public class UserService implements UserDetailsService {
         return userRepository.getId(name);
     }
 
-    public void saveUser(User user) {
+    public User saveUser(User user) {
         user.setRole("ROLE_author");
-        userRepository.save(user);
+        return userRepository.save(user);
+    }
+
+    public boolean existsById(int userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public boolean existsByName(String username) {
+        return userRepository.existsByName(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

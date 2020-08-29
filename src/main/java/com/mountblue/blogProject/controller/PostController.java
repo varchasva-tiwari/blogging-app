@@ -33,11 +33,11 @@ public class PostController {
     private UserService userService;
 
     @PostMapping ("/posts")
-    private ResponseEntity<String> savePost(@RequestBody List<Map<String, ? extends Object>> postTags, Principal principal) {
+    private ResponseEntity<String> savePost(@RequestBody List<Map<String, ?>> postTags, Principal principal) {
         Post post = null;
 
         if (principal.getName() == null) {
-            return new ResponseEntity<>("You need to be logged in to perform this action!",
+            return new ResponseEntity<>("You must be logged in to perform this action!",
                     HttpStatus.UNAUTHORIZED);
         } else {
             if (isPermitted(principal)) {
@@ -45,29 +45,40 @@ public class PostController {
                 Map<String, String> tagsMap = (Map<String, String>) postTags.get(1);
 
                 for(Map.Entry<String, Map> postMapEntry : postMap.entrySet()) {
-                    post = postService.savePost(new Post(postMapEntry.getValue()));
+                    post = new Post(postMapEntry.getValue());
+
+                    if(post.getAuthor() == null || post.getTitle() == null || post.getContent() == null ||
+                    post.getExcerpt() == null) {
+                        return new ResponseEntity<>("Author/Title/Content/Excerpt cannot be null!",
+                                HttpStatus.BAD_REQUEST);
+                    }
+
+                    post.setAuthor(principal.getName());
+                    post.setUserId(userService.getUserId(principal.getName()));
+
+                    post = postService.savePost(post);
                 }
 
                 for(Map.Entry<String, String> tagsMapEntry : tagsMap.entrySet()) {
                     List<Integer> newTagIds = tagService.editTags(tagsMapEntry.getValue());
                     postTagService.savePostTag(post.getId(), newTagIds);
                 }
-
-                HttpHeaders header = new HttpHeaders();
-                header.add("Location", "/posts/{"+post.getId()+"}");
-
-                return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>("You are not permitted to perform this action!",
+                return new ResponseEntity<>("You do not have permissions to perform this action!",
                         HttpStatus.FORBIDDEN);
             }
         }
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Location", "/posts/"+post.getId());
+
+        return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.CREATED);
     }
 
     @GetMapping("/posts/{id}")
     private ResponseEntity<?> getPost(@PathVariable("id") int postId) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!",
+            return new ResponseEntity<>("Post does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
@@ -88,26 +99,32 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    private ResponseEntity<List<List<Map>>> getPosts() {
+    private ResponseEntity<?> getPosts() {
         return getPaginatedPosts(1, 10,"publishedAt", "asc");
     }
 
     @GetMapping(value = "/posts", params = {"start", "limit", "sortField", "sortOrder"})
-    private ResponseEntity<List<List<Map>>> getPaginatedPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                             @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
-                             @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
-                             @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+    private ResponseEntity<?> getPaginatedPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                                              @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                                              @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+                                                              @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
         List<Post> posts = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
         List<List<Map>> postTags = postTagService.getPostTags(posts);
+
+        if(posts == null || postTags == null) {
+            return new ResponseEntity<String>("Posts could not be retrieved due to server issues! Please try again later!",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
     @PatchMapping("/posts/{id}")
     private ResponseEntity<String> editPost(@PathVariable("id") int postId,
-                                            @RequestBody List<Map<String, ? extends Object>> editedPost,
+                                            @RequestBody List<Map<String, ?>> editedPostTags,
                                             Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!",
+            return new ResponseEntity<>("Post does not exist or has been deleted!",
                     HttpStatus.NOT_FOUND);
         }
 
@@ -118,10 +135,13 @@ public class PostController {
             if (isPermitted(principal, postId)) {
                 Post updatedPost = null;
 
-                Map<String, Map> postMap = (Map<String, Map>) editedPost.get(0);
+                Map<String, Map> postMap = (Map<String, Map>) editedPostTags.get(0);
 
                 for(Map.Entry<String, Map> postEntry : postMap.entrySet()) {
-                    updatedPost = postService.editPost(new Post(postEntry.getValue()));
+                    updatedPost = new Post(postEntry.getValue());
+
+                    updatedPost.setId(postId);
+                    updatedPost = postService.editPost(updatedPost);
 
                     if(updatedPost == null) {
                         return new ResponseEntity<>("The post could not be updated due to server issues! Please try again later!",
@@ -129,8 +149,8 @@ public class PostController {
                     }
                 }
 
-                if(editedPost.size() == 2) {
-                    Map<String, String> tagsMap = (Map<String, String>) editedPost.get(1);
+                if(editedPostTags.size() == 2) {
+                    Map<String, String> tagsMap = (Map<String, String>) editedPostTags.get(1);
 
                     for(Map.Entry<String, String> tagsEntry : tagsMap.entrySet()) {
                         List<Integer> newTagIds = tagService.editTags(tagsEntry.getValue());
@@ -138,7 +158,7 @@ public class PostController {
                     }
                 }
             } else {
-                return new ResponseEntity<>("You are not permitted to perform this action!",
+                return new ResponseEntity<>("Only the author can perform this action!",
                         HttpStatus.FORBIDDEN);
             }
         }
@@ -149,7 +169,7 @@ public class PostController {
     @DeleteMapping(value = "/posts/{id}")
     private ResponseEntity<String> deletePost(@PathVariable("id") int postId, Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Incorrect post id!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Post does not exist!", HttpStatus.NOT_FOUND);
         }
 
         if (principal.getName() == null) {
@@ -161,7 +181,7 @@ public class PostController {
                 postService.deletePost(postId);
                 postTagService.deleteTag(postId);
             } else {
-                return new ResponseEntity<>("You are not permitted to perform this action!",
+                return new ResponseEntity<>("Only the author can perform this action!",
                         HttpStatus.FORBIDDEN);
             }
         }
@@ -170,19 +190,23 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts", params = "keyword")
-    private ResponseEntity<List<List<Map>>> paginatedAndSortedSearch(@RequestParam("keyword") String keyword,
-                                                                     @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                                                                     @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
-                                                                     @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
-                                                                     @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+    private ResponseEntity<?> search(@RequestParam("keyword") String keyword,
+                                                   @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                                   @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                                   @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+                                                   @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+        if(keyword == null || keyword.equals("")) {
+            return new ResponseEntity<>("Keyword cannot be null or empty!", HttpStatus.BAD_REQUEST);
+        }
 
         Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
 
-        List<Post> posts = page.getContent();
-
-        if(posts.size() == 0) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(page == null) {
+            return new ResponseEntity<>("Posts could not be retrieved due to server issues! Please try again later!",
+                    HttpStatus.NOT_FOUND);
         }
+
+        List<Post> posts = page.getContent();
 
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 
@@ -197,17 +221,20 @@ public class PostController {
                                      @RequestParam(value = "tags", defaultValue = "") String tags,
                                      @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer pageSize) {
-        Page page = null;
+        if(!filter) {
+            return new ResponseEntity<>("Filter cannot be false or null!", HttpStatus.BAD_REQUEST);
+        }
 
-        System.out.println(author);
+        Page page = null;
 
         page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, date, tags);
 
-        List<Post> posts = page.getContent();
 
-        if(posts.size() == 0) {
-            return new ResponseEntity<>("Invalid filters!", HttpStatus.NOT_FOUND);
+        if(page == null) {
+            return new ResponseEntity<>("No results available for given filters!", HttpStatus.NOT_FOUND);
         }
+
+        List<Post> posts = page.getContent();
 
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 

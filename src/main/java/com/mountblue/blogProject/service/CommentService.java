@@ -33,9 +33,18 @@ public class CommentService {
             return null;
         }
 
-        updatedComment.setName(comment.getName());
-        updatedComment.setEmail(comment.getEmail());
-        updatedComment.setComment(comment.getComment());
+        if(comment.getName() != null) {
+            updatedComment.setName(comment.getName());
+        }
+
+        if(comment.getEmail() != null) {
+            updatedComment.setEmail(comment.getEmail());
+        }
+
+        if(comment.getComment() != null) {
+            updatedComment.setComment(comment.getComment());
+        }
+
         updatedComment.setUpdatedAt(LocalDateTime.now());
 
         return commentRepository.save(updatedComment);
