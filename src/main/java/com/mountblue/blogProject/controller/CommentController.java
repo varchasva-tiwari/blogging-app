@@ -51,7 +51,7 @@ public class CommentController {
 
         comment.setPostId(postId);
 
-        if(principal.getName() != null) {
+        if(principal != null) {
             comment.setUserId(userService.getUserId(principal.getName()));
         }
 
@@ -127,7 +127,7 @@ public class CommentController {
                     HttpStatus.NOT_FOUND);
         }
 
-        if (principal.getName() == null) {
+        if (principal == null) {
             return new ResponseEntity<>("You are not authorized to perform this action! Please login first!",
                     HttpStatus.UNAUTHORIZED);
         } else {
@@ -180,7 +180,7 @@ public class CommentController {
                     HttpStatus.NOT_FOUND);
         }
 
-        if (principal.getName() == null) {
+        if (principal == null) {
             return new ResponseEntity<>("You are not authorized to perform this action! Please login first!",
                     HttpStatus.UNAUTHORIZED);
         } else {

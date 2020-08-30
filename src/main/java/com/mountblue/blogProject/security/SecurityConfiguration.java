@@ -4,6 +4,7 @@ import com.mountblue.blogProject.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,12 +35,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/blogApp/login",
-                        "/blogApp/posts",
                         "/v2/api-docs/**",
                         "/swagger-resources/**",
                         "/swagger-ui.html",
                         "/webjars/**" ,
                         "/swagger.json").permitAll()
+                .antMatchers(HttpMethod.GET, "/blogApp/posts").permitAll()
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments").permitAll()
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments/[0-9]+").permitAll()
+                .regexMatchers(HttpMethod.POST, "/blogApp/posts/[0-9]+/comments").permitAll()
                 .anyRequest().authenticated().and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

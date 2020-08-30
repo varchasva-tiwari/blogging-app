@@ -6,7 +6,6 @@ import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class PostController {
     private ResponseEntity<String> savePost(@RequestBody List<Map<String, ?>> postTags, Principal principal) {
         Post post = null;
 
-        if (principal.getName() == null) {
+        if (principal == null) {
             return new ResponseEntity<>("You must be logged in to perform this action!",
                     HttpStatus.UNAUTHORIZED);
         } else {
@@ -92,7 +91,6 @@ public class PostController {
         return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.CREATED);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{id}")
     @ApiOperation("Returns a specific blog post based on the id")
     private ResponseEntity<?> getPost(@PathVariable("id") int postId) {
@@ -117,7 +115,6 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping(value = "/posts")
     @ApiOperation("Returns all blog posts")
     private ResponseEntity<?> getPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
@@ -146,7 +143,7 @@ public class PostController {
                     HttpStatus.NOT_FOUND);
         }
 
-        if (principal.getName() == null) {
+        if (principal == null) {
             return new ResponseEntity<>("You need to be logged in to perform this action!",
                     HttpStatus.UNAUTHORIZED);
         } else {
@@ -192,7 +189,7 @@ public class PostController {
             return new ResponseEntity<>("Post does not exist!", HttpStatus.NOT_FOUND);
         }
 
-        if (principal.getName() == null) {
+        if (principal == null) {
             return new ResponseEntity<>("You need to be logged in to perform this action!",
                     HttpStatus.UNAUTHORIZED);
         } else {
@@ -209,7 +206,6 @@ public class PostController {
         return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping(value = "/posts", params = "keyword")
     @ApiOperation("Searches & gets the blog posts having a specific keyword")
     private ResponseEntity<?> search(@RequestParam("keyword") String keyword,
@@ -235,13 +231,11 @@ public class PostController {
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw"),
-            @ApiImplicitParam(name = "filter", required = true, dataType = "boolean", paramType = "query")
-    })
-    @GetMapping(value = "/posts", params = "filter")
-    @ApiOperation("Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags")
-    private ResponseEntity<?> filter(@RequestParam(value = "filter") boolean filter,
+
+   @ApiImplicitParam(name = "filter", required = true, dataType = "boolean", paramType = "query")
+   @GetMapping(value = "/posts", params = "filter")
+   @ApiOperation("Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags")
+   private ResponseEntity<?> filter(@RequestParam(value = "filter") boolean filter,
                                      @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                      @RequestParam(value = "author", defaultValue = "") String author,
                                      @RequestParam(value = "date", defaultValue = "") String date,
