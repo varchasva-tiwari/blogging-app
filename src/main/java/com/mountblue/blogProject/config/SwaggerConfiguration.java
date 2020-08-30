@@ -9,6 +9,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.security.Principal;
 import java.util.Collections;
 
 @Configuration
@@ -21,6 +22,7 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("com.mountblue"))
                 .build()
                 .enableUrlTemplating(true)
+                .ignoredParameterTypes(Principal.class)
                 .apiInfo(getApiInfo());
     }
 
