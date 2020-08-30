@@ -30,7 +30,7 @@ public class SwaggerConfiguration {
                 "This is the API for Blog App Project",
                 "0.0",
                 "sample",
-                new Contact("Varchasva","sample","varchasva.tiwari@mountblue.tech"),
+                new Contact("Varchasva","https://blog-project-app.herokuapp.com/","varchasva.tiwari@mountblue.tech"),
                 "License",
                 "sample",
                 Collections.emptyList()
