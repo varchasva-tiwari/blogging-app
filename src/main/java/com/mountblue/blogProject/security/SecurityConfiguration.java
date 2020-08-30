@@ -40,7 +40,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/webjars/**" ,
                         "/swagger.json").permitAll()
-                .antMatchers(HttpMethod.GET, "/blogApp/posts").permitAll()
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts").permitAll()
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+").permitAll()
                 .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments").permitAll()
                 .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments/[0-9]+").permitAll()
                 .regexMatchers(HttpMethod.POST, "/blogApp/posts/[0-9]+/comments").permitAll()
