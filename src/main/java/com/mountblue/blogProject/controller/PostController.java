@@ -4,6 +4,10 @@ import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.entity.Post;
 import com.mountblue.blogProject.entity.Tag;
 import com.mountblue.blogProject.service.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +20,8 @@ import java.security.Principal;
 import java.util.*;
 
 @RestController
+@Api(description = "Set of endpoints for Creating, Retrieving, Updating, Searching, Filtering and Deleting of Posts")
+@RequestMapping("/blogApp")
 public class PostController {
     @Autowired
     private PostService postService;
@@ -32,7 +38,9 @@ public class PostController {
     @Autowired
     private UserService userService;
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PostMapping ("/posts")
+    @ApiOperation("Creates a new blog post")
     private ResponseEntity<String> savePost(@RequestBody List<Map<String, ?>> postTags, Principal principal) {
         Post post = null;
 
@@ -41,8 +49,17 @@ public class PostController {
                     HttpStatus.UNAUTHORIZED);
         } else {
             if (isPermitted(principal)) {
+                if(postTags.size() < 1) {
+                    return new ResponseEntity<>("Request body cannot be empty!", HttpStatus.BAD_REQUEST);
+                }
+
                 Map<String, Map> postMap = (Map<String, Map>) postTags.get(0);
-                Map<String, String> tagsMap = (Map<String, String>) postTags.get(1);
+
+                Map<String, String> tagsMap = null;
+
+                if(postTags.size() == 2) {
+                    tagsMap = (Map<String, String>) postTags.get(1);
+                }
 
                 for(Map.Entry<String, Map> postMapEntry : postMap.entrySet()) {
                     post = new Post(postMapEntry.getValue());
@@ -75,7 +92,9 @@ public class PostController {
         return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.CREATED);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{id}")
+    @ApiOperation("Returns a specific blog post based on the id")
     private ResponseEntity<?> getPost(@PathVariable("id") int postId) {
         if(!postService.existsById(postId)) {
             return new ResponseEntity<>("Post does not exist or has been deleted!",
@@ -98,16 +117,13 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    @GetMapping("/posts")
-    private ResponseEntity<?> getPosts() {
-        return getPaginatedPosts(1, 10,"publishedAt", "asc");
-    }
-
-    @GetMapping(value = "/posts", params = {"start", "limit", "sortField", "sortOrder"})
-    private ResponseEntity<?> getPaginatedPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                                                              @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
-                                                              @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
-                                                              @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
+    @GetMapping(value = "/posts")
+    @ApiOperation("Returns all blog posts")
+    private ResponseEntity<?> getPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                       @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                       @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+                                       @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
         List<Post> posts = postService.getPaginatedAndSorted(pageNo, pageSize, sortField, sortOrder);
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 
@@ -119,7 +135,9 @@ public class PostController {
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PatchMapping("/posts/{id}")
+    @ApiOperation("Edits a blog post based on id")
     private ResponseEntity<String> editPost(@PathVariable("id") int postId,
                                             @RequestBody List<Map<String, ?>> editedPostTags,
                                             Principal principal) {
@@ -166,7 +184,9 @@ public class PostController {
         return new ResponseEntity<String>("Post updated successfully!", HttpStatus.OK);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @DeleteMapping(value = "/posts/{id}")
+    @ApiOperation("Deletes a blog post based on id")
     private ResponseEntity<String> deletePost(@PathVariable("id") int postId, Principal principal) {
         if(!postService.existsById(postId)) {
             return new ResponseEntity<>("Post does not exist!", HttpStatus.NOT_FOUND);
@@ -189,12 +209,14 @@ public class PostController {
         return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping(value = "/posts", params = "keyword")
+    @ApiOperation("Searches & gets the blog posts having a specific keyword")
     private ResponseEntity<?> search(@RequestParam("keyword") String keyword,
-                                                   @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                                                   @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
-                                                   @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
-                                                   @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
+                                     @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
+                                     @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
+                                     @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+                                     @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
         if(keyword == null || keyword.equals("")) {
             return new ResponseEntity<>("Keyword cannot be null or empty!", HttpStatus.BAD_REQUEST);
         }
@@ -213,28 +235,26 @@ public class PostController {
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw"),
+            @ApiImplicitParam(name = "filter", required = true, dataType = "boolean", paramType = "query")
+    })
     @GetMapping(value = "/posts", params = "filter")
+    @ApiOperation("Searches & returns the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags(comma separated)")
     private ResponseEntity<?> filter(@RequestParam(value = "filter") boolean filter,
                                      @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                      @RequestParam(value = "author", defaultValue = "") String author,
                                      @RequestParam(value = "date", defaultValue = "") String date,
-                                     @RequestParam(value = "tags", defaultValue = "") String tags,
-                                     @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
-                                     @RequestParam(value = "limit", defaultValue = "10") Integer pageSize) {
+                                     @RequestParam(value = "tags", defaultValue = "") String tags) {
         if(!filter) {
             return new ResponseEntity<>("Filter cannot be false or null!", HttpStatus.BAD_REQUEST);
         }
 
-        Page page = null;
+        List<Post> posts = postService.searchAndFilterPosts(keyword, author, date, tags);
 
-        page = postService.searchAndFilterPosts(pageNo, pageSize, keyword, author, date, tags);
-
-
-        if(page == null) {
+        if(posts == null) {
             return new ResponseEntity<>("No results available for given filters!", HttpStatus.NOT_FOUND);
         }
-
-        List<Post> posts = page.getContent();
 
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 

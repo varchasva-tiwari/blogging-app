@@ -2,6 +2,7 @@ package com.mountblue.blogProject.controller;
 
 import com.mountblue.blogProject.entity.User;
 import com.mountblue.blogProject.service.UserService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,11 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
+@Api(description = "Endpoint for Registration of Users")
+@RequestMapping("/blogApp")
 public class UserController {
     @Autowired
     private UserService userService;
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PostMapping("/users")
+    @ApiOperation("Registers a new user")
     public ResponseEntity<?> saveUser(@RequestBody Map<String, User> userMap) {
         User user = null;
 

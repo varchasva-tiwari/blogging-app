@@ -4,6 +4,10 @@ import com.mountblue.blogProject.entity.Comment;
 import com.mountblue.blogProject.service.CommentService;
 import com.mountblue.blogProject.service.PostService;
 import com.mountblue.blogProject.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,8 @@ import java.security.Principal;
 import java.util.*;
 
 @RestController
+@Api(description = "Set of endpoints for Creating, Retrieving, Updating and Deleting of Comments")
+@RequestMapping("/blogApp")
 public class CommentController {
     @Autowired
     private PostService postService;
@@ -24,7 +30,9 @@ public class CommentController {
     @Autowired
     private UserService userService;
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PostMapping("/posts/{postId}/comments")
+    @ApiOperation("Creates a new comment")
     public ResponseEntity<String> saveComment(@PathVariable("postId") int postId,
                                               @RequestBody Map<String, Comment> commentMap,
                                               Principal principal) {
@@ -59,7 +67,9 @@ public class CommentController {
         return new ResponseEntity<>("Comment saved successfully!", header, HttpStatus.CREATED);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{postId}/comments/{commentId}")
+    @ApiOperation("Returns a specific comment based on post id & comment id")
     public ResponseEntity<?> getComment(@PathVariable("postId") int postId,
                                         @PathVariable("commentId") int commentId) {
         if(!postService.existsById(postId)) {
@@ -85,7 +95,9 @@ public class CommentController {
         return new ResponseEntity<>(commentMap, HttpStatus.OK);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{postId}/comments")
+    @ApiOperation("Returns all comments based on post id")
     public ResponseEntity<?> getComments(@PathVariable("postId") int postId) {
         if(!postService.existsById(postId)) {
             return new ResponseEntity<>("Post does not exist or has been deleted!",
@@ -98,7 +110,9 @@ public class CommentController {
         return new ResponseEntity<>(commentsMap, HttpStatus.OK);
     }
 
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PatchMapping("/posts/{postId}/comments/{commentId}")
+    @ApiOperation("Edits a comment based on post id & comment id")
     public ResponseEntity<String> editComment(@PathVariable("postId") int postId,
                                               @PathVariable("commentId") int commentId,
                                               @RequestBody Map<String, Comment> commentMap,
@@ -149,7 +163,10 @@ public class CommentController {
         return new ResponseEntity<>("Comment updated successfully!", HttpStatus.OK);
     }
 
+
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @DeleteMapping ("/posts/{postId}/comments/{commentId}")
+    @ApiOperation("Delete a comment based on post id & comment id")
     public ResponseEntity<String> deleteComment(@PathVariable("postId") int postId,
                                                 @PathVariable("commentId") int commentId,
                                                 Principal principal) {

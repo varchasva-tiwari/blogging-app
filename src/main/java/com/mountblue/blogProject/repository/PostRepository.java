@@ -41,10 +41,9 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
             "((coalesce(:tagNames, null)) is null or p2.id IN (SELECT pt.post_id FROM post_tags pt WHERE pt.tag_id IN" +
             "(SELECT t.id FROM tags t WHERE t.name IN (:tagNames)))) ORDER BY p2.published_at --#pageable\n) AS post2 " +
             "ON post1.id = post2.id) AS post3",
-            countQuery = "SELECT count(*) FROM post3",
             nativeQuery = true)
-    Page<Post> searchAndFilter(@Param("keyword") String keyword, @Param("author") String author, @Param("publishedAt") String publishedAt,
-                               @Param("tagNames") List<String> tagNames, Pageable pageable);
+    List<Post> searchAndFilter(@Param("keyword") String keyword, @Param("author") String author, @Param("publishedAt") String publishedAt,
+                               @Param("tagNames") List<String> tagNames);
 
     @Query("SELECT p.author FROM Post p WHERE p.id = :postId")
     String getAuthorById(@Param("postId") int postId);

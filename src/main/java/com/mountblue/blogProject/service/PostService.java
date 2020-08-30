@@ -76,15 +76,14 @@ public class PostService {
         return postRepository.paginatedAndSortedSearch(keyword, pageable);
     }
 
-    public Page<Post> searchAndFilterPosts(int pageNo, int pageSize, String keyword, String author, String date, String tags) {
+    public List<Post> searchAndFilterPosts(String keyword, String author, String date, String tags) {
         List<String> tagNames = new ArrayList<>();
 
         if(!tags.equals("")) {
             tagNames =  Arrays.asList(tags.split(", "));
         }
 
-        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return postRepository.searchAndFilter(keyword, author, date, tagNames, pageable);
+        return postRepository.searchAndFilter(keyword, author, date, tagNames);
     }
 
     public boolean exists(Post post) {
