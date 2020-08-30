@@ -216,12 +216,15 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.comments (id, name, email, comment, post_id, created_at, updated_at, user_id) FROM stdin;
-17	Lucey	lucey@gmail.com	This is Lucey	28	2020-08-20 07:55:43.060824+05:30	2020-08-20 07:55:43.060861+05:30	0
-27	Rahul	rahul@gmail.com	This is Rahul	34	2020-08-21 12:28:14.204437+05:30	2020-08-21 12:28:14.2045+05:30	0
-28	varchasva	varchasva@gmail.com	This is varchasva	37	2020-08-21 12:29:11.978523+05:30	2020-08-21 12:29:11.978553+05:30	5
 29	Rahul	rahul@gmail.com	This is comment	28	2020-08-21 12:47:57.42466+05:30	2020-08-21 12:47:57.424737+05:30	0
 30	Rahul	rahul@gmail.com	uyugy	25	2020-08-21 13:24:28.329778+05:30	2020-08-21 13:24:28.329815+05:30	0
 31	Palash	palash@gmail.com	This is Palash	28	2020-08-22 16:24:59.906185+05:30	2020-08-22 16:24:59.906256+05:30	0
+32	Rohit	rohit@yahoo.com	This is Rohit	28	2020-08-27 07:49:08.441488+05:30	2020-08-27 07:49:08.441673+05:30	0
+33	Rahul	rahul@gmail.com	This is rahul	31	2020-08-27 10:53:02.41775+05:30	2020-08-27 10:53:02.417831+05:30	0
+34	Lucifer	lucifer@gmail.com	This is lucifer	28	2020-08-28 09:23:21.357056+05:30	2020-08-28 09:23:21.357116+05:30	6
+36	irfan	irfanpathan@gmail.com	This is Irfan	37	2020-08-28 23:03:29.186638+05:30	2020-08-29 15:02:29.619169+05:30	6
+38	angelina jolie	angie@gmail.com	The best actress in the world suggests protection of trees	54	2020-08-29 15:07:21.915161+05:30	2020-08-29 15:08:41.406397+05:30	6
+39	angelina jolie	angie@gmail.com	The best actress in the world suggests protection of trees	54	2020-08-29 15:09:38.729025+05:30	2020-08-29 15:09:38.729086+05:30	6
 \.
 
 
@@ -234,11 +237,6 @@ COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
 28	14	\N	\N
 31	10	\N	\N
 31	11	\N	\N
-34	10	\N	\N
-34	12	\N	\N
-35	13	\N	\N
-35	11	\N	\N
-35	10	\N	\N
 36	11	\N	\N
 36	10	\N	\N
 37	12	\N	\N
@@ -249,10 +247,6 @@ COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
 39	12	\N	\N
 39	11	\N	\N
 39	10	\N	\N
-40	11	\N	\N
-40	12	\N	\N
-40	13	\N	\N
-40	10	\N	\N
 42	10	\N	\N
 42	11	\N	\N
 42	13	\N	\N
@@ -261,6 +255,18 @@ COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
 45	11	\N	\N
 45	12	\N	\N
 45	16	\N	\N
+51	18	\N	\N
+51	13	\N	\N
+53	19	2020-08-29 11:52:28.460594	2020-08-29 11:52:28.460631
+53	20	2020-08-29 11:52:28.551588	2020-08-29 11:52:28.551619
+54	19	2020-08-29 12:27:15.753067	2020-08-29 12:27:15.753103
+54	20	2020-08-29 12:27:15.791349	2020-08-29 12:27:15.791393
+54	21	2020-08-29 12:27:15.803222	2020-08-29 12:27:15.80326
+54	22	2020-08-29 12:44:40.012675	2020-08-29 12:44:40.012716
+55	19	2020-08-30 10:30:10.039538	2020-08-30 10:30:10.03957
+55	20	2020-08-30 10:30:10.09872	2020-08-30 10:30:10.098755
+56	23	2020-08-30 10:32:56.915705	2020-08-30 10:32:56.915736
+56	24	2020-08-30 10:32:56.935143	2020-08-30 10:32:56.935166
 \.
 
 
@@ -269,18 +275,20 @@ COPY public.post_tags (post_id, tag_id, created_at, updated_at) FROM stdin;
 --
 
 COPY public.posts (id, title, excerpt, content, author, published_at, is_published, created_at, updated_at, user_id) FROM stdin;
+55	About Plants	Plants give us life	Save plants & trees	lucifer	2020-08-30 10:30:09.91764	t	2020-08-30 10:30:09.917677	2020-08-30 10:30:09.917688	6
+56	About psychology	This is about psychology	Study psychology	lucifer	2020-08-30 10:32:56.80516	t	2020-08-30 10:32:56.80522	2020-08-30 10:32:56.805234	6
 28	Big galaxies	Struggles	Life	admin	2020-08-19 20:52:23.533214	t	2020-08-19 20:52:23.533273	2020-08-19 20:52:23.533293	4
 31	Blog 3	blog	blog	Sachin	2020-08-20 12:14:35.369812	t	2020-08-20 12:14:35.369853	2020-08-20 12:14:35.369871	7
-34	Blog 5	Blog 5 	Blog 5	lucifer	2020-08-21 09:01:35.812968	t	2020-08-21 09:01:35.81302	2020-08-21 09:01:35.813038	6
-35	Blog 6	Blog 6	Blog 6	lucifer	2020-08-21 09:02:03.330117	t	2020-08-21 09:02:03.330151	2020-08-21 09:02:03.330167	6
 36	Blog 7	Blog 7	Blog 7	lucifer	2020-08-21 09:02:19.367875	t	2020-08-21 09:02:19.367898	2020-08-21 09:02:19.367907	6
 37	Blog 8	Blog 8	Blog 8	lucifer	2020-08-21 09:02:38.708792	t	2020-08-21 09:02:38.708828	2020-08-21 09:02:38.708842	6
 38	Blog 9	Blog 9	Blog 9	lucifer	2020-08-21 09:03:11.315533	t	2020-08-21 09:03:11.315557	2020-08-21 09:03:11.315566	6
 39	Blog 10	Blog 10	Blog 10	lucifer	2020-08-21 09:03:32.193683	t	2020-08-21 09:03:32.193711	2020-08-21 09:03:32.193719	6
-40	Blog 11	Blog 11	Blog 11	lucifer	2020-08-21 09:03:49.176796	t	2020-08-21 09:03:49.176825	2020-08-21 09:03:49.176838	6
 42	Computer Science	this is cs	this is cs	Rahul	2020-08-21 13:42:37.878076	t	2020-08-21 13:42:37.878116	2020-08-21 13:42:37.878127	8
 43	Computer Science	CS	This is CS blog	Rahul	2020-08-22 16:20:08.418915	t	2020-08-22 16:20:08.418974	2020-08-22 16:20:08.418994	8
 45	Blog 9	This is excerpt	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.	VVS	2020-08-23 13:14:48.751263	t	2020-08-23 13:14:48.751306	2020-08-23 13:14:48.751344	9
+51	Blog At Night	This is a blog written at night	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.	Night Walker	2020-08-27 01:30:22.773074	t	2020-08-27 01:30:22.773121	2020-08-27 01:30:22.773138	0
+53	About Plants	Plants give us life	Save plants & trees	admin	2020-08-29 11:52:28.197099	t	2020-08-29 11:52:28.197184	2020-08-29 11:52:28.197197	0
+54	About Plants & Trees	Plants give us life	Save plants & trees	lucifer	2020-08-29 12:27:15.562717	t	2020-08-29 12:27:15.562788	2020-08-29 12:44:39.791589	0
 \.
 
 
@@ -297,6 +305,13 @@ COPY public.tags (id, name, created_at, updated_at) FROM stdin;
 15	cs	2020-08-21 12:56:00.9971+05:30	\N
 16	computers	2020-08-22 16:20:08.527028+05:30	\N
 17	history	2020-08-22 16:28:55.119426+05:30	\N
+18	Lifestyle	2020-08-27 01:30:22.900024+05:30	2020-08-27 01:30:22.900084+05:30
+19	go green	2020-08-29 11:52:28.238496+05:30	2020-08-29 11:52:28.238518+05:30
+20	plants	2020-08-29 11:52:28.439035+05:30	2020-08-29 11:52:28.439064+05:30
+21	environment	2020-08-29 12:27:15.732572+05:30	2020-08-29 12:27:15.73261+05:30
+22	Global warming	2020-08-29 12:44:39.90828+05:30	2020-08-29 12:44:39.908325+05:30
+23	human brain	2020-08-30 10:32:56.838077+05:30	2020-08-30 10:32:56.838139+05:30
+24	psychology	2020-08-30 10:32:56.895517+05:30	2020-08-30 10:32:56.895554+05:30
 \.
 
 
@@ -311,6 +326,7 @@ COPY public.users (id, name, email, password, role) FROM stdin;
 7	Sachin	sachin@gmail.com	sachin	ROLE_author
 8	Rahul	rahul@gmail.com	rahul	ROLE_author
 9	VVS	vvs@gmail.com	vvs	ROLE_author
+10	Don Bradman	donbrad@gmail.com	donbradman	ROLE_author
 \.
 
 
@@ -318,7 +334,7 @@ COPY public.users (id, name, email, password, role) FROM stdin;
 -- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.comments_id_seq', 31, true);
+SELECT pg_catalog.setval('public.comments_id_seq', 39, true);
 
 
 --
@@ -332,21 +348,21 @@ SELECT pg_catalog.setval('public.hibernate_sequence', 1, false);
 -- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.posts_id_seq', 45, true);
+SELECT pg_catalog.setval('public.posts_id_seq', 56, true);
 
 
 --
 -- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.tags_id_seq', 17, true);
+SELECT pg_catalog.setval('public.tags_id_seq', 24, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 9, true);
+SELECT pg_catalog.setval('public.users_id_seq', 10, true);
 
 
 --
