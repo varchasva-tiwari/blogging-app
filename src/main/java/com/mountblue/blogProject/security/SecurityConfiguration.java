@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +32,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts")
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+")
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments")
+                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments/[0-9]+")
+                .regexMatchers(HttpMethod.POST, "/blogApp/posts/[0-9]+/comments");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
@@ -40,12 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/webjars/**" ,
                         "/swagger.json").permitAll()
-                .regexMatchers(HttpMethod.GET, "/blogApp/posts").permitAll()
-                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+").permitAll()
-                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments").permitAll()
-                .regexMatchers(HttpMethod.GET, "/blogApp/posts/[0-9]+/comments/[0-9]+").permitAll()
-                .regexMatchers(HttpMethod.POST, "/blogApp/posts/[0-9]+/comments").permitAll()
-                .anyRequest().authenticated().and()
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
