@@ -18,7 +18,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PostMapping("/users")
     @ApiOperation("Registers a new user")
     public ResponseEntity<?> saveUser(@RequestBody Map<String, User> userMap) {

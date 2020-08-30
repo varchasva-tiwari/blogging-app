@@ -30,7 +30,6 @@ public class CommentController {
     @Autowired
     private UserService userService;
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @PostMapping("/posts/{postId}/comments")
     @ApiOperation("Creates a new comment")
     public ResponseEntity<String> saveComment(@PathVariable("postId") int postId,
@@ -67,7 +66,6 @@ public class CommentController {
         return new ResponseEntity<>("Comment saved successfully!", header, HttpStatus.CREATED);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{postId}/comments/{commentId}")
     @ApiOperation("Returns a specific comment based on post id & comment id")
     public ResponseEntity<?> getComment(@PathVariable("postId") int postId,
@@ -95,7 +93,6 @@ public class CommentController {
         return new ResponseEntity<>(commentMap, HttpStatus.OK);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
     @GetMapping("/posts/{postId}/comments")
     @ApiOperation("Returns all comments based on post id")
     public ResponseEntity<?> getComments(@PathVariable("postId") int postId) {
