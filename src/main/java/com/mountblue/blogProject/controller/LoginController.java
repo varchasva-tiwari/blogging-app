@@ -33,18 +33,22 @@ public class LoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private final String USER_REQUIRED_FIELDS_NULL = "Username/Email/Password cannot be null!";
+    private final String WRONG_CREDENTIALS = "Incorrect username or password!";
+    private final String AUTHENTICATE_USER = "Authenticates a user based on username & password, assigns him a JWT needed for other operations";
+
     @PostMapping("/login")
-    @ApiOperation("Authenticates a user based on username & password, assigns him a JWT needed for other operations")
+    @ApiOperation(AUTHENTICATE_USER)
     private ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         if(authenticationRequest.getUsername() == null || authenticationRequest.getPassword() == null) {
-            return new ResponseEntity<>("Username/Password cannot be null!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(USER_REQUIRED_FIELDS_NULL, HttpStatus.BAD_REQUEST);
         }
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
                     (authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password!", e);
+            throw new Exception(WRONG_CREDENTIALS, e);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());

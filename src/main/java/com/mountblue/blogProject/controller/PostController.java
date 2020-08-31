@@ -37,21 +37,40 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
+    private final String JWT_EXAMPLE = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw";
+    private final String USER_MUST_BE_LOGGED_IN = "You must be logged in to perform this action!";
+    private final String POST_REQUIRED_FIELDS_NULL = "Author/Title/Content/Excerpt cannot be null!";
+    private final String ONLY_AUTHOR_HAS_PERMISSION = "Only the author can perform this action!";
+    private final String INSUFFICIENT_PERMISSIONS = "You do not have permissions to perform this action!";
+    private final String POST_DOES_NOT_EXIST_OR_DELETED = "Post does not exist or has been deleted!";
+    private final String POST_WRONG_PAGINATION_VALUES = "Incorrect start/limit/sortField/sortOrder value(s)!";
+    private final String POST_WRONG_FORMAT = "Post is wrong/wrongly formatted. Please check the provided JSON!";
+    private final String POST_KEYWORD_NULL_OR_EMPTY = "Keyword cannot be null or empty!";
+    private final String POST_FILTER_FALSE = "Filter cannot be false!";
+    private final String POST_KEYWORD_NO_RESULTS = "No results available for given search keyword!";
+    private final String POST_FILTER_NO_RESULTS = "No results available for given filters!";
+    private final String POST_SAVED = "Post saved successfully!";
+    private final String POST_UPDATED = "Post updated successfully!";
+    private final String POST_DELETED = "Post deleted successfully!";
+    private final String CREATE_POST = "Creates a new post";
+    private final String READ_POST = "Returns a specific blog post based on the id";
+    private final String READ_ALL_POSTS = "Returns all blog posts";
+    private final String UPDATE_POST = "Edits a blog post based on id";
+    private final String DELETE_POST = "Deletes a blog post based on id";
+    private final String SEARCH_POSTS = "Searches & gets the blog posts having a specific keyword";
+    private final String FILTER_POSTS = "Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags. Can also search keywords.";
+
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = JWT_EXAMPLE)
     @PostMapping ("/posts")
-    @ApiOperation("Creates a new post")
+    @ApiOperation(CREATE_POST)
     private ResponseEntity<String> savePost(@RequestBody List<Map<String, ?>> postTags, Principal principal) {
         Post post = null;
 
         if (principal == null) {
-            return new ResponseEntity<>("You must be logged in to perform this action!",
+            return new ResponseEntity<>(USER_MUST_BE_LOGGED_IN,
                     HttpStatus.UNAUTHORIZED);
         } else {
             if (isPermitted(principal)) {
-                if(postTags.size() < 1) {
-                    return new ResponseEntity<>("Request body cannot be empty!", HttpStatus.BAD_REQUEST);
-                }
-
                 Map<String, Map> postMap = (Map<String, Map>) postTags.get(0);
 
                 Map<String, String> tagsMap = null;
@@ -65,7 +84,7 @@ public class PostController {
 
                     if(post.getAuthor() == null || post.getTitle() == null || post.getContent() == null ||
                     post.getExcerpt() == null) {
-                        return new ResponseEntity<>("Author/Title/Content/Excerpt cannot be null!",
+                        return new ResponseEntity<>(POST_REQUIRED_FIELDS_NULL,
                                 HttpStatus.BAD_REQUEST);
                     }
 
@@ -73,6 +92,10 @@ public class PostController {
                     post.setUserId(userService.getUserId(principal.getName()));
 
                     post = postService.savePost(post);
+
+                    if(post == null) {
+                        return new ResponseEntity<>(POST_WRONG_FORMAT, HttpStatus.BAD_REQUEST);
+                    }
                 }
 
                 for(Map.Entry<String, String> tagsMapEntry : tagsMap.entrySet()) {
@@ -80,7 +103,7 @@ public class PostController {
                     postTagService.savePostTag(post.getId(), newTagIds);
                 }
             } else {
-                return new ResponseEntity<>("You do not have permissions to perform this action!",
+                return new ResponseEntity<>(INSUFFICIENT_PERMISSIONS,
                         HttpStatus.FORBIDDEN);
             }
         }
@@ -88,14 +111,14 @@ public class PostController {
         HttpHeaders header = new HttpHeaders();
         header.add("Location", "/posts/"+post.getId());
 
-        return new ResponseEntity<>("Post saved successfully!", header, HttpStatus.CREATED);
+        return new ResponseEntity<>(POST_SAVED, header, HttpStatus.CREATED);
     }
 
     @GetMapping("/posts/{id}")
-    @ApiOperation("Returns a specific blog post based on the id")
+    @ApiOperation(READ_POST)
     private ResponseEntity<?> getPost(@PathVariable("id") int postId) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Post does not exist or has been deleted!",
+            return new ResponseEntity<>(POST_DOES_NOT_EXIST_OR_DELETED,
                     HttpStatus.NOT_FOUND);
         }
 
@@ -116,7 +139,7 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts")
-    @ApiOperation("Returns all blog posts")
+    @ApiOperation(READ_ALL_POSTS)
     private ResponseEntity<?> getPosts(@RequestParam(value = "start", defaultValue = "1") Integer pageNo,
                                        @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
                                        @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
@@ -125,26 +148,26 @@ public class PostController {
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 
         if(posts == null || postTags == null) {
-            return new ResponseEntity<String>("Posts could not be retrieved due to server issues! Please try again later!",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(POST_WRONG_PAGINATION_VALUES,
+                    HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(postTags, HttpStatus.OK);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = JWT_EXAMPLE)
     @PatchMapping("/posts/{id}")
-    @ApiOperation("Edits a blog post based on id")
+    @ApiOperation(UPDATE_POST)
     private ResponseEntity<String> editPost(@PathVariable("id") int postId,
                                             @RequestBody List<Map<String, ?>> editedPostTags,
                                             Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Post does not exist or has been deleted!",
+            return new ResponseEntity<>(POST_DOES_NOT_EXIST_OR_DELETED,
                     HttpStatus.NOT_FOUND);
         }
 
         if (principal == null) {
-            return new ResponseEntity<>("You need to be logged in to perform this action!",
+            return new ResponseEntity<>(USER_MUST_BE_LOGGED_IN,
                     HttpStatus.UNAUTHORIZED);
         } else {
             if (isPermitted(principal, postId)) {
@@ -159,8 +182,8 @@ public class PostController {
                     updatedPost = postService.editPost(updatedPost);
 
                     if(updatedPost == null) {
-                        return new ResponseEntity<>("The post could not be updated due to server issues! Please try again later!",
-                                HttpStatus.INTERNAL_SERVER_ERROR);
+                        return new ResponseEntity<>(POST_WRONG_FORMAT,
+                                HttpStatus.BAD_REQUEST);
                     }
                 }
 
@@ -173,24 +196,24 @@ public class PostController {
                     }
                 }
             } else {
-                return new ResponseEntity<>("Only the author can perform this action!",
+                return new ResponseEntity<>(ONLY_AUTHOR_HAS_PERMISSION,
                         HttpStatus.FORBIDDEN);
             }
         }
 
-        return new ResponseEntity<String>("Post updated successfully!", HttpStatus.OK);
+        return new ResponseEntity<String>(POST_UPDATED, HttpStatus.OK);
     }
 
-    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNpZmVyIiwiZXhwIjoxNTk4NzU4Mzc3LCJpYXQiOjE1OTg3MjIzNzd9.jg9TdkOXIXsqLI4-Eyq35j__CCv13Ovvvd1htW04nWw")
+    @ApiImplicitParam(name = "Authorization", required = true, dataType = "String", paramType = "header", example = JWT_EXAMPLE)
     @DeleteMapping(value = "/posts/{id}")
-    @ApiOperation("Deletes a blog post based on id")
+    @ApiOperation(DELETE_POST)
     private ResponseEntity<String> deletePost(@PathVariable("id") int postId, Principal principal) {
         if(!postService.existsById(postId)) {
-            return new ResponseEntity<>("Post does not exist!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(POST_DOES_NOT_EXIST_OR_DELETED, HttpStatus.NOT_FOUND);
         }
 
         if (principal == null) {
-            return new ResponseEntity<>("You need to be logged in to perform this action!",
+            return new ResponseEntity<>(USER_MUST_BE_LOGGED_IN,
                     HttpStatus.UNAUTHORIZED);
         } else {
             if (isPermitted(principal, postId)) {
@@ -198,23 +221,23 @@ public class PostController {
                 postService.deletePost(postId);
                 postTagService.deleteTag(postId);
             } else {
-                return new ResponseEntity<>("Only the author can perform this action!",
+                return new ResponseEntity<>(ONLY_AUTHOR_HAS_PERMISSION,
                         HttpStatus.FORBIDDEN);
             }
         }
 
-        return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
+        return new ResponseEntity<>(POST_DELETED, HttpStatus.OK);
     }
 
     @GetMapping(value = "/posts", params = "keyword")
-    @ApiOperation("Searches & gets the blog posts having a specific keyword")
+    @ApiOperation(SEARCH_POSTS)
     private ResponseEntity<?> search(@RequestParam("keyword") String keyword,
                                      @RequestParam(value = "start", defaultValue = "1") Integer pageNo,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer pageSize,
                                      @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
                                      @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) {
         if(keyword == null || keyword.equals("")) {
-            return new ResponseEntity<>("Keyword cannot be null or empty!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(POST_KEYWORD_NULL_OR_EMPTY, HttpStatus.BAD_REQUEST);
         }
 
         Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
@@ -222,7 +245,7 @@ public class PostController {
         List<Post> posts = page.getContent();
 
         if(posts.size() == 0) {
-            return new ResponseEntity<>("No results available for given search keyword!",
+            return new ResponseEntity<>(POST_KEYWORD_NO_RESULTS,
                     HttpStatus.NOT_FOUND);
         }
 
@@ -234,20 +257,20 @@ public class PostController {
 
    @ApiImplicitParam(name = "filter", required = true, dataType = "boolean", paramType = "query")
    @GetMapping(value = "/posts", params = "filter")
-   @ApiOperation("Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags. Can also search keywords.")
+   @ApiOperation(FILTER_POSTS)
    private ResponseEntity<?> filter(@RequestParam(value = "filter") boolean filter,
                                      @RequestParam(value = "search", defaultValue = "") String keyword,
                                      @RequestParam(value = "author", defaultValue = "") String author,
                                      @RequestParam(value = "date", defaultValue = "") String date,
                                      @RequestParam(value = "tags", defaultValue = "") String tags) {
         if(!filter) {
-            return new ResponseEntity<>("Filter cannot be false or null!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(POST_FILTER_FALSE, HttpStatus.BAD_REQUEST);
         }
 
         List<Post> posts = postService.searchAndFilterPosts(keyword, author, date, tags);
 
         if(posts.size() == 0) {
-            return new ResponseEntity<>("No results available for given filters!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(POST_FILTER_NO_RESULTS, HttpStatus.NOT_FOUND);
         }
 
         List<List<Map>> postTags = postTagService.getPostTags(posts);
