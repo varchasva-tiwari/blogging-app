@@ -246,7 +246,7 @@ public class PostController {
 
         List<Post> posts = postService.searchAndFilterPosts(keyword, author, date, tags);
 
-        if(posts == null) {
+        if(posts.size() == 0) {
             return new ResponseEntity<>("No results available for given filters!", HttpStatus.NOT_FOUND);
         }
 
