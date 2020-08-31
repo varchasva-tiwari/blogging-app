@@ -219,12 +219,12 @@ public class PostController {
 
         Page page = postService.paginatedAndSortedSearch(keyword, pageNo, pageSize, sortField, sortOrder);
 
-        if(page == null) {
-            return new ResponseEntity<>("Posts could not be retrieved due to server issues! Please try again later!",
+        List<Post> posts = page.getContent();
+
+        if(posts.size() == 0) {
+            return new ResponseEntity<>("No results available for given search keyword!",
                     HttpStatus.NOT_FOUND);
         }
-
-        List<Post> posts = page.getContent();
 
         List<List<Map>> postTags = postTagService.getPostTags(posts);
 
