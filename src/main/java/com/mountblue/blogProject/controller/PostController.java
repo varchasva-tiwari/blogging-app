@@ -234,9 +234,9 @@ public class PostController {
 
    @ApiImplicitParam(name = "filter", required = true, dataType = "boolean", paramType = "query")
    @GetMapping(value = "/posts", params = "filter")
-   @ApiOperation("Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags")
+   @ApiOperation("Searches & gets the blog posts based on specified filters like author name, date(in YYYY-MM-DD) & tags. Can also search keywords.")
    private ResponseEntity<?> filter(@RequestParam(value = "filter") boolean filter,
-                                     @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                     @RequestParam(value = "search", defaultValue = "") String keyword,
                                      @RequestParam(value = "author", defaultValue = "") String author,
                                      @RequestParam(value = "date", defaultValue = "") String date,
                                      @RequestParam(value = "tags", defaultValue = "") String tags) {
